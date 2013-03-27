@@ -129,15 +129,17 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		
 		//views that are only to be displayed in fullscreen mode
 		ArrayList<View> fsViews = new ArrayList<View>();
-		//add them here
 		
-		
+		fsViews.add(this.findViewById(R.id.yay_button));
+		fsViews.add(this.findViewById(R.id.meh_button));
+		fsViews.add(this.findViewById(R.id.nay_button));
+			
 		//views that are only to be displayed in non fullscreen mode
 		ArrayList<View> normalViews = new ArrayList<View>();
 		
 		normalViews.add(this.findViewById(R.id.textView1));
 		normalViews.add(this.findViewById(R.id.spinner1));
-		normalViews.add(this.findViewById(R.id.button2));
+		normalViews.add(this.findViewById(R.id.go_button));
 		
 		if(fullscreen){
 			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
