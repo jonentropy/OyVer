@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Talk {
 	@SerializedName("id")
-	public long id;
+	public int id;
 	
 	@SerializedName("title")
 	public String title;
