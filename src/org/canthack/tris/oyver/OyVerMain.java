@@ -142,19 +142,21 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		normalViews.add(this.findViewById(R.id.go_button));
 		
 		if(fullscreen){
+			for(View v: normalViews) v.setVisibility(View.GONE);
+			
 			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 			getActionBar().hide();
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);	
 			
-			for(View v: normalViews) v.setVisibility(View.GONE);
 			for(View v: fsViews) v.setVisibility(View.VISIBLE);
 		}
 		else{
+			for(View v: fsViews) v.setVisibility(View.GONE);
+			
 			getActionBar().show();
 			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
 			
-			for(View v: fsViews) v.setVisibility(View.GONE);
 			for(View v: normalViews) v.setVisibility(View.VISIBLE);
 		}
 	}
@@ -215,6 +217,17 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		if (key.equals(Settings.OYVER_SETTING_SERVER)) {
 			downloadTalks();
 		}
+	}
+	
+	@Override
+	public void onBackPressed() {
+	    if(fullscreen){
+	    	fullscreen=false;
+	    	setGuiMode();
+	    }
+	    else{
+	    	super.onBackPressed();
+	    }
 	}
 
 }
