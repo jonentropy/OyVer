@@ -9,8 +9,8 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
-	private static final String OYVER_SETTING_SERVER = "server";
-	private static final String OYVER_SETTING_VOTING = "voting";
+	public static final String OYVER_SETTING_SERVER = "server";
+	public static final String OYVER_SETTING_VOTING = "voting";
 	
 	private EditTextPreference mServerPref;
 	private EditTextPreference mVotingPref;
@@ -36,13 +36,13 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 	}
 
 	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+	public void onSharedPreferenceChanged(SharedPreferences prefs,
 			String key) {
 		if (key.equals(OYVER_SETTING_SERVER)) {
-			mServerPref.setSummary(sharedPreferences.getString(key, "")); 
+			mServerPref.setSummary(prefs.getString(key, "")); 
 		}
 		else if (key.equals(OYVER_SETTING_VOTING)) {
-			mVotingPref.setSummary(sharedPreferences.getString(key, "")); 
+			mVotingPref.setSummary(prefs.getString(key, "")); 
 		}
 	}
 
