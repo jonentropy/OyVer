@@ -3,7 +3,6 @@ package org.canthack.tris.oyver;
 
 import java.util.ArrayList;
 
-import org.canthack.tris.oyver.model.json.ListTalksResponse;
 import org.canthack.tris.oyver.model.json.Talk;
 
 import android.net.ConnectivityManager;
@@ -19,20 +18,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 public class OyVerMain extends Activity {
+	private static final String TAG = "OyVer Main";
 
 	enum GuiMode {SELECT_SESSION, VOTE_SESSION};
 
-	private ArrayList<Talk> talks = new ArrayList<Talk>();
 	private GuiMode guimode = GuiMode.SELECT_SESSION;
 
 	private TalkDownloadTask talkDLTask;
 
-	private static final String TAG = "OyVer Main";
+	private int selectedTalkId;
+	private String selectedTalkTitle;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -43,13 +43,33 @@ public class OyVerMain extends Activity {
 		if( (talkDLTask = (TalkDownloadTask)getLastNonConfigurationInstance()) != null) {
 			talkDLTask.setContext(this); 
 			if(talkDLTask.getStatus() == AsyncTask.Status.FINISHED)
-				populateTalks(talkDLTask.getTalks());
+				talkDLTask.populateTalks((Spinner)this.findViewById(R.id.spinner1));
 		}
 		else{
 			downloadTalks();
 		}
 
-		setGuiMode(guimode);
+		Spinner talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
+		talkSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View arg1,
+					int i, long l) {
+				if(i > 0){ //0 is for the "select session" line. Also explains -1s below :-)
+
+					selectedTalkId = talkDLTask.getTalkIds().get(i-1);
+					selectedTalkTitle = talkDLTask.getTalks().talks.get(i-1).title;
+
+					Log.v(TAG, "SELECTED " + i + "." + l + "." + selectedTalkId);
+					Log.v(TAG, "SEL: " + selectedTalkTitle);
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+
+			}
+		});
 	}
 
 	@Override
@@ -110,7 +130,7 @@ public class OyVerMain extends Activity {
 	public void switchModes(View v){
 		//setGuiMode(GuiMode.VOTE_SESSION);
 		//TODO
-		populateTalks(talkDLTask.getTalks());
+		talkDLTask.populateTalks((Spinner)this.findViewById(R.id.spinner1));
 	}
 
 	private void downloadTalks(){
@@ -124,7 +144,6 @@ public class OyVerMain extends Activity {
 			// Since diStatus must be FINISHED, we can try again.
 		}
 
-
 		ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
@@ -135,7 +154,7 @@ public class OyVerMain extends Activity {
 		}
 		else{
 			talkDLTask = new TalkDownloadTask(this);
-			
+
 			try{
 				talkDLTask.execute(Settings.getServerAddress(this));
 			}
@@ -145,28 +164,6 @@ public class OyVerMain extends Activity {
 			}
 		}
 	}
-
-	public void populateTalks(ListTalksResponse response){
-		if(response == null)
-			return;
-
-		Log.d(TAG, "Populating");
-
-		talks.clear();
-		talks = response.talks;
-
-		ArrayList<String> talkNames = new ArrayList<String>();
-
-		for(Talk t : talks){
-			talkNames.add(t.title);
-		}
-
-		Spinner s = (Spinner) this.findViewById(R.id.spinner1);
-		ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, talkNames);	
-		spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); 
-		s.setAdapter(spinnerArrayAdapter);
-	}
-
 
 	// This gets called before onDestroy(). We want to pass forward a reference
 	// to our AsyncTask.

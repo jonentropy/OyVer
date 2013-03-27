@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 
 import org.canthack.tris.oyver.model.json.ListTalksResponse;
+import org.canthack.tris.oyver.model.json.Talk;
 
 import com.google.gson.Gson;
 
@@ -14,6 +16,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,6 +26,8 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 	private Context mContext; // reference to the calling Activity
 	int progress = -1;
 	private ListTalksResponse downloadedTalks = null;
+	private ArrayList<Integer> talkIds = new ArrayList<Integer>();
+	
 	String lastError = "";
 	private static final String TAG = "OyVer DownloadTask";
 
@@ -69,6 +74,8 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 		if(result != null) {
 			downloadedTalks = result;
 			talkSpinner.setVisibility(View.VISIBLE);
+			
+			populateTalks(talkSpinner);
 		}
 		else {
 			errorMessage = "Problem downloading talk list. Please try later.\n" + lastError;
@@ -79,6 +86,27 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 				((Activity) mContext).findViewById(R.id.error_text);
 
 		errorMsg.setText(errorMessage);	
+	}
+	
+	public void populateTalks(Spinner s){
+		if(downloadedTalks == null)
+			return;
+
+		Log.d(TAG, "Populating");
+		
+		talkIds.clear();
+
+		ArrayList<String> talkNames = new ArrayList<String>();
+
+		for(Talk t : downloadedTalks.talks){
+			talkNames.add(t.title);
+			talkIds.add(t.id);
+		}
+
+		ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_dropdown_item, talkNames);	
+		spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); 
+		spinnerArrayAdapter.insert(mContext.getString(R.string.select_session), 0);
+		s.setAdapter(spinnerArrayAdapter);
 	}
 
 	public ListTalksResponse downloadTalks(String location)
@@ -106,6 +134,10 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 		setProgress(100);
 		return response;
 	}
+	
+	public ArrayList<Integer> getTalkIds(){
+		return talkIds;
+	}
 
 	private void setProgress(int progress) {
 		this.progress = progress;
@@ -114,6 +146,11 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 	
 	public ListTalksResponse getTalks(){
 		return downloadedTalks;
+	}
+
+	public void populateTalks() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

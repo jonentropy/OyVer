@@ -3,7 +3,8 @@
 
     <string name="app_name">OyVer</string>
     <string name="action_refresh">Refresh</string>
-    <string name="select_session">Select Session:</string>
+    <string name="sessions">Sessions:</string>
+    <string name="select_session">Select Session</string>
     <string name="no_internet">No internet connection</string>
     <string name="settings_title">Settings</string>
     <string name="default_hostname">http://</string>
