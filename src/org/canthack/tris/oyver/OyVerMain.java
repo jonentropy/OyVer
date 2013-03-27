@@ -1,18 +1,16 @@
 package org.canthack.tris.oyver;
 
-
-import java.util.ArrayList;
-
-import org.canthack.tris.oyver.model.json.Talk;
-
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,12 +20,10 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class OyVerMain extends Activity {
+public class OyVerMain extends Activity implements OnSharedPreferenceChangeListener {
 	private static final String TAG = "OyVer Main";
 
-	enum GuiMode {SELECT_SESSION, VOTE_SESSION};
-
-	private GuiMode guimode = GuiMode.SELECT_SESSION;
+	private boolean fullscreen = false;
 
 	private TalkDownloadTask talkDLTask;
 
@@ -70,6 +66,16 @@ public class OyVerMain extends Activity {
 
 			}
 		});
+
+		if (savedInstanceState != null){
+			fullscreen = savedInstanceState.getBoolean("guimode");
+		}
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle bund) {
+		super.onSaveInstanceState(bund);
+		bund.putBoolean("guimode", fullscreen);
 	}
 
 	@Override
@@ -84,7 +90,7 @@ public class OyVerMain extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 		case R.id.action_refresh:
-			downloadTalks();//TODO fix
+			downloadTalks();
 			return true;
 		case R.id.action_settings:
 			startActivity(new Intent(this, Settings.class));
@@ -99,38 +105,42 @@ public class OyVerMain extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		setGuiMode(guimode);
+		setGuiMode();
+
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		preferences.registerOnSharedPreferenceChangeListener(this);
+	}
+
+	@Override
+	protected void onPause(){
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		preferences.registerOnSharedPreferenceChangeListener(this);
+		super.onPause();
 	}
 
 	@SuppressLint("NewApi")
-	private void setGuiMode(GuiMode mode){
-		Log.d(TAG, "Setting GUI Mode: " + mode);
-		guimode = mode;
+	private void setGuiMode(){
+		Log.d(TAG, "Setting GUI Mode: " + fullscreen);
 
 		View main_layout = this.findViewById(android.R.id.content).getRootView();
 
-		switch(mode){
-		case SELECT_SESSION: 
-			getActionBar().show();
-			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-			break;
-
-		case VOTE_SESSION:
+		if(fullscreen){
 			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 			getActionBar().hide();
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);  
-			break;
-
-		default:
-			break;
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);		
+		}
+		else{
+			getActionBar().show();
+			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
 		}
 	}
 
 	public void switchModes(View v){
-		//setGuiMode(GuiMode.VOTE_SESSION);
-		//TODO
-		talkDLTask.populateTalks((Spinner)this.findViewById(R.id.spinner1));
+		fullscreen = !fullscreen;
+		setGuiMode();
+
+		//	talkDLTask.populateTalks((Spinner)this.findViewById(R.id.spinner1));
 	}
 
 	private void downloadTalks(){
@@ -170,6 +180,13 @@ public class OyVerMain extends Activity {
 	@Override
 	public Object onRetainNonConfigurationInstance() {
 		return talkDLTask;
+	}
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+		if (key.equals(Settings.OYVER_SETTING_SERVER)) {
+			downloadTalks();
+		}
 	}
 
 }
