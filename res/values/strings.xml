@@ -9,5 +9,6 @@
     <string name="settings_title">Settings</string>
     <string name="default_hostname">http://</string>
     <string name="server_string">Talks location</string>
+    <string name="vote_server_string">Voting location</string>
 
 </resources>

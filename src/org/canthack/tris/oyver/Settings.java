@@ -10,12 +10,20 @@ import android.preference.PreferenceManager;
 
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	private static final String OYVER_SETTING_SERVER = "server";
+	private static final String OYVER_SETTING_VOTING = "voting";
+	
 	private EditTextPreference mServerPref;
+	private EditTextPreference mVotingPref;
 
 	//Settings
 	public static String getServerAddress(Context context) {
 		return PreferenceManager.getDefaultSharedPreferences(context)
 				.getString(OYVER_SETTING_SERVER, context.getResources().getString(R.string.default_hostname));
+	}
+	
+	public static String getVotingServerAddress(Context context) {
+		return PreferenceManager.getDefaultSharedPreferences(context)
+				.getString(OYVER_SETTING_VOTING, context.getResources().getString(R.string.default_hostname));
 	}
 
 	@Override
@@ -24,6 +32,7 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 		addPreferencesFromResource(R.xml.preferences);
 
 		mServerPref = (EditTextPreference) getPreferenceScreen().findPreference(OYVER_SETTING_SERVER);
+		mVotingPref = (EditTextPreference) getPreferenceScreen().findPreference(OYVER_SETTING_VOTING);
 	}
 
 	@Override
@@ -32,6 +41,9 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 		if (key.equals(OYVER_SETTING_SERVER)) {
 			mServerPref.setSummary(sharedPreferences.getString(key, "")); 
 		}
+		else if (key.equals(OYVER_SETTING_VOTING)) {
+			mVotingPref.setSummary(sharedPreferences.getString(key, "")); 
+		}
 	}
 
 	@Override
@@ -39,6 +51,7 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 		super.onResume();
 
 		mServerPref.setSummary(mServerPref.getText());
+		mVotingPref.setSummary(mVotingPref.getText());
 		
 		// Set up a listener whenever a setting changes            
 		getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
@@ -51,6 +64,4 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 		// Unregister the listener whenever a setting changes            
 		getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);    
 	}
-
-
 }

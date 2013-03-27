@@ -7,5 +7,10 @@
         android:dialogTitle="@string/server_string"
         android:key="server"
         android:title="@string/server_string" />
+    <EditTextPreference
+        android:defaultValue="@string/default_hostname"
+        android:dialogTitle="@string/vote_server_string"
+        android:key="voting"
+        android:title="@string/vote_server_string" />
 
 </PreferenceScreen>
