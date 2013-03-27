@@ -9,8 +9,6 @@ import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.params.ConnPerRoute;
@@ -84,6 +82,8 @@ public final class CustomHTTPClient {
 
 		try {
 			final HttpResponse response = CustomHTTPClient.getHttpClient().execute(getRequest);
+			if(response == null) return null;
+			
 			final int statusCode = response.getStatusLine().getStatusCode();
 
 			if (statusCode != HttpStatus.SC_OK) { 
@@ -91,12 +91,16 @@ public final class CustomHTTPClient {
 			}
 
 			final HttpEntity getResponseEntity = response.getEntity();
+			if(getResponseEntity == null) return null;
 
 			final InputStream s = getResponseEntity.getContent();
 
 			return s;
 		} 
 		catch (IOException e) {
+			getRequest.abort();
+		}
+		catch(IllegalStateException e){
 			getRequest.abort();
 		}
 
