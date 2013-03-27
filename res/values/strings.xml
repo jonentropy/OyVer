@@ -6,6 +6,9 @@
     <string name="sessions">Sessions:</string>
     <string name="select_session">Select Session</string>
     <string name="go">Go!</string>
+    <string name="yay">:)</string>
+    <string name="meh">:|</string>
+    <string name="nay">:(</string>
     <string name="no_internet">No internet connection</string>
     <string name="settings_title">Settings</string>
     <string name="default_hostname">http://</string>
