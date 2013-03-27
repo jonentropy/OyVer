@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -30,8 +31,8 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 	private TalkDownloadTask talkDLTask;
 
-	private int selectedTalkId;
-	private String selectedTalkTitle;
+	private int selectedTalkId = -1;
+	private String selectedTalkTitle = "";
 
 	@SuppressLint("NewApi")
 	@Override
@@ -61,6 +62,10 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 					Log.v(TAG, "SELECTED " + i + "." + l + "." + selectedTalkId);
 					Log.v(TAG, "SEL: " + selectedTalkTitle);
+				}
+				else{
+					selectedTalkId = -1;
+					selectedTalkTitle = "";
 				}
 			}
 
@@ -126,51 +131,72 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		Log.d(TAG, "Setting GUI Mode: " + fullscreen);
 
 		View main_layout = this.findViewById(android.R.id.content).getRootView();
-		
+
 		//views that are only to be displayed in fullscreen mode
 		ArrayList<View> fsViews = new ArrayList<View>();
-		
+
 		fsViews.add(this.findViewById(R.id.yay_button));
 		fsViews.add(this.findViewById(R.id.meh_button));
 		fsViews.add(this.findViewById(R.id.nay_button));
-			
+
 		//views that are only to be displayed in non fullscreen mode
 		ArrayList<View> normalViews = new ArrayList<View>();
-		
+
 		normalViews.add(this.findViewById(R.id.textView1));
 		normalViews.add(this.findViewById(R.id.spinner1));
 		normalViews.add(this.findViewById(R.id.go_button));
-		
+
 		if(fullscreen){
 			for(View v: normalViews) v.setVisibility(View.GONE);
-			
+
 			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 			getActionBar().hide();
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);	
-			
+
 			for(View v: fsViews) v.setVisibility(View.VISIBLE);
 		}
 		else{
 			for(View v: fsViews) v.setVisibility(View.GONE);
-			
+
 			getActionBar().show();
 			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
-			
+
 			for(View v: normalViews) v.setVisibility(View.VISIBLE);
 		}
 	}
 
-	public void switchModes(View v){
-		fullscreen = !fullscreen;
-		setGuiMode();
-
-		//	talkDLTask.populateTalks((Spinner)this.findViewById(R.id.spinner1));
-	}
-	
 	public void startVoting(View v){
-		fullscreen = true;
-		setGuiMode();
+		if(selectedTalkId >= 0){
+			fullscreen = true;
+			setGuiMode();
+		}
+	}
+
+	public void voteButtonClick(View v){
+				
+		ObjectAnimator animator = ObjectAnimator.ofFloat(v, "alpha", 0.2f, 1f);
+
+		animator.setDuration(300);
+		animator.start();	
+		
+		switch(v.getId()){
+		case R.id.yay_button:
+			//TODO queue votes here...
+
+			break;
+
+		case R.id.meh_button:
+
+
+			break;
+
+		case R.id.nay_button:
+
+
+			break;
+
+		}
 	}
 
 	private void downloadTalks(){
@@ -218,16 +244,16 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			downloadTalks();
 		}
 	}
-	
+
 	@Override
 	public void onBackPressed() {
-	    if(fullscreen){
-	    	fullscreen=false;
-	    	setGuiMode();
-	    }
-	    else{
-	    	super.onBackPressed();
-	    }
+		if(fullscreen){
+			fullscreen=false;
+			setGuiMode();
+		}
+		else{
+			super.onBackPressed();
+		}
 	}
 
 }

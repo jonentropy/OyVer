@@ -10,28 +10,35 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" >
 
-        <ImageButton
+        <Button
             android:id="@+id/yay_button"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:background="#00FF00" 
             android:layout_weight="0.3"
+            android:background="#00FF00"
+            android:layout_marginRight="2dp" 
+            android:onClick="voteButtonClick"
             android:text="@string/yay" />
 
-        <ImageButton
+        <Button
             android:id="@+id/meh_button"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:background="#FFFF00" 
             android:layout_weight="0.3"
+            android:background="#FFFF00"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:onClick="voteButtonClick"
             android:text="@string/meh" />
 
-        <ImageButton
+        <Button
             android:id="@+id/nay_button"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:background="#FF0000" 
             android:layout_weight="0.3"
+            android:background="#FF0000"
+            android:layout_marginLeft="2dp"
+            android:onClick="voteButtonClick"
             android:text="@string/nay" />
     </LinearLayout>
 
@@ -55,16 +62,6 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/textView1"
             android:layout_below="@+id/textView1" />
-
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="16dp"
-            android:onClick="switchModes"
-            android:text="DEBUG - SWITCH GUI MODES" />
 
         <ProgressBar
             android:id="@+id/progressBar1"
@@ -90,9 +87,10 @@
             android:layout_below="@+id/spinner1"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
+            android:onClick="startVoting"
             android:paddingLeft="48dp"
             android:paddingRight="48dp"
-            android:onClick="startVoting"
             android:text="@string/go" />
     </RelativeLayout>
+
 </RelativeLayout>
