@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="0.3"
-            android:background="#FFFF00"
+            android:background="#FFFF33"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
             android:onClick="voteButtonClick"
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="0.3"
-            android:background="#FF0000"
+            android:background="#FF1919"
             android:layout_marginLeft="2dp"
             android:onClick="voteButtonClick"
             android:text="@string/nay" />
