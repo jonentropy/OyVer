@@ -1,5 +1,7 @@
 package org.canthack.tris.oyver;
 
+import java.util.ArrayList;
+
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class OyVerMain extends Activity implements OnSharedPreferenceChangeListener {
@@ -123,16 +126,34 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		Log.d(TAG, "Setting GUI Mode: " + fullscreen);
 
 		View main_layout = this.findViewById(android.R.id.content).getRootView();
-
+		
+		//views that are only to be displayed in fullscreen mode
+		ArrayList<View> fsViews = new ArrayList<View>();
+		//add them here
+		
+		
+		//views that are only to be displayed in non fullscreen mode
+		ArrayList<View> normalViews = new ArrayList<View>();
+		
+		normalViews.add(this.findViewById(R.id.textView1));
+		normalViews.add(this.findViewById(R.id.spinner1));
+		normalViews.add(this.findViewById(R.id.button2));
+		
 		if(fullscreen){
 			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 			getActionBar().hide();
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);		
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);	
+			
+			for(View v: normalViews) v.setVisibility(View.GONE);
+			for(View v: fsViews) v.setVisibility(View.VISIBLE);
 		}
 		else{
 			getActionBar().show();
 			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
+			
+			for(View v: fsViews) v.setVisibility(View.GONE);
+			for(View v: normalViews) v.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -141,6 +162,11 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		setGuiMode();
 
 		//	talkDLTask.populateTalks((Spinner)this.findViewById(R.id.spinner1));
+	}
+	
+	public void startVoting(View v){
+		fullscreen = true;
+		setGuiMode();
 	}
 
 	private void downloadTalks(){
