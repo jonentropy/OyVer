@@ -84,6 +84,8 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		});
 
 		if (savedInstanceState != null){
+			selectedTalkId = savedInstanceState.getInt("selectedtalk");
+			selectedTalkTitle = savedInstanceState.getString("selectedtalkname");
 			fullscreen = savedInstanceState.getBoolean("guimode");
 		}
 	}
@@ -92,6 +94,8 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	protected void onSaveInstanceState(Bundle bund) {
 		super.onSaveInstanceState(bund);
 		bund.putBoolean("guimode", fullscreen);
+		bund.putInt("selectedtalk", selectedTalkId);
+		bund.putString("selectedtalkname", selectedTalkTitle);
 	}
 
 	@Override
