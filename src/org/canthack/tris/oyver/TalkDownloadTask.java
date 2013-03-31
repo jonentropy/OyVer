@@ -47,6 +47,7 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 		progress = 0;
 		Spinner talkSpinner = (Spinner) ((Activity) mContext).findViewById(R.id.spinner1);
 		talkSpinner.setVisibility(View.INVISIBLE);
+		
 	}
 
 	protected ListTalksResponse doInBackground(String ... location) {
@@ -78,7 +79,7 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 			populateTalks(talkSpinner);
 		}
 		else {
-			errorMessage = "Could not download talks. Check settings.";
+			errorMessage = mContext.getString(R.string.error_downloading_talks);
 			talkSpinner.setVisibility(View.INVISIBLE);
 		}
 
