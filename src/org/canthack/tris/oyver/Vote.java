@@ -14,9 +14,9 @@ public class Vote implements Serializable{
 
 	public Vote(String endpoint, int id, int vt){
 		StringBuilder urlBuilder = new StringBuilder().append(endpoint);
-		if(endpoint.endsWith("/")) urlBuilder.append('/');
+		if(!endpoint.endsWith("/")) urlBuilder.append('/');
 
-		urlBuilder.append("INCR").append(id).append('_');
+		urlBuilder.append("INCR").append('/').append(id).append('_');
 
 		switch(vt){
 		case YAY: 
@@ -29,6 +29,8 @@ public class Vote implements Serializable{
 			urlBuilder.append("nay");
 			break;
 		}
+		
+		url = urlBuilder.toString();
 	}
 
 	public String getUrl(){

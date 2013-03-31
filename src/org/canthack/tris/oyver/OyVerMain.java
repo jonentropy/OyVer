@@ -36,6 +36,8 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	private int selectedTalkId = -1;
 	private String selectedTalkTitle = "";
 
+	private Thread voterThread;
+
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +90,9 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			selectedTalkTitle = savedInstanceState.getString("selectedtalkname");
 			fullscreen = savedInstanceState.getBoolean("guimode");
 		}
+		
+		voterThread = new Thread(null, voter, "Voter");
+		voterThread.start();
 	}
 
 	@Override
@@ -200,19 +205,15 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		switch(v.getId()){
 		case R.id.yay_button:
 			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.YAY);
-
 			break;
 
 		case R.id.meh_button:
 			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.MEH);
-
 			break;
 
 		case R.id.nay_button:
 			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.NAY);
-
 			break;
-
 		}
 		
 		voter.queueVote(vote);
