@@ -25,28 +25,21 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 public class OyVerMain extends Activity implements OnSharedPreferenceChangeListener {
 	private static final String TAG = "OyVer Main";
 
 	private boolean fullscreen = false;
 
-	//private Voter voter;
 	static class NonConfigurationObject{
-
 		TalkDownloadTask talkDLTask;
 		Voter voter;
 		Thread voterThread;
-
 	}
-	//	private TalkDownloadTask talkDLTask;
-
+	
 	private NonConfigurationObject nco;
 
 	private int selectedTalkId = -1;
 	private String selectedTalkTitle = "";
-
-	//private static Thread voterThread;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -71,6 +64,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			}
 		}
 		else{
+			Log.v(TAG, "Making new NCO");
 			nco = new NonConfigurationObject();
 			
 			nco.voter = new Voter(this);
@@ -269,7 +263,6 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			}
 			catch(Exception e){
 				e.printStackTrace();
-				//err.setText(e.getMessage());
 			}
 		}
 	}
@@ -298,5 +291,4 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			super.onBackPressed();
 		}
 	}
-
 }

@@ -18,17 +18,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class Voter implements Runnable {
-
+	private static final String TAG = "OyVer Voter";
+	private static final String SERIAL_FILENAME = "votes";
 	public static final int MAX_ATTEMPTS = 10;
 
 	private Context ctx = null;
 
 	private Deque<Vote> votes;
 	private boolean running = true;
-
-	private static final String SERIAL_FILENAME = "votes";
-
-	private static final String TAG = "OyVer Voter";
 
 	public Voter(Context c){
 		this.ctx = c;		
@@ -100,7 +97,7 @@ public class Voter implements Runnable {
 
 		while(running){
 			try {
-				Thread.sleep(500);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -172,7 +169,6 @@ public class Voter implements Runnable {
 	}
 
 	private boolean sendVote(Vote v) {
-
 		InputStream s = CustomHTTPClient.retrieveStream(v.getUrl());	
 		if(s == null) return false;
 
