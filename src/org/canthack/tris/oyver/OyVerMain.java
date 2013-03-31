@@ -29,14 +29,14 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	private static final String TAG = "OyVer Main";
 
 	private boolean fullscreen = false;
-
+	
+	private Voter voter;
 	private TalkDownloadTask talkDLTask;
-	private Voter voter = new Voter();
 
 	private int selectedTalkId = -1;
 	private String selectedTalkTitle = "";
 
-	private Thread voterThread;
+	private static Thread voterThread;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -90,9 +90,6 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			selectedTalkTitle = savedInstanceState.getString("selectedtalkname");
 			fullscreen = savedInstanceState.getBoolean("guimode");
 		}
-		
-		voterThread = new Thread(null, voter, "Voter");
-		voterThread.start();
 	}
 
 	@Override
@@ -134,19 +131,23 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(this);
+		
+		voter = new Voter(this);
+		voterThread = new Thread(null, voter, "Voter");
+		voterThread.start();
 	}
 
 	@Override
 	protected void onPause(){
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(this);
+		
+		voter.stop();
 		super.onPause();
 	}
 
 	@SuppressLint("NewApi")
 	private void setGuiMode(){
-		Log.d(TAG, "Setting GUI Mode: " + fullscreen);
-
 		View main_layout = this.findViewById(android.R.id.content).getRootView();
 
 		//views that are only to be displayed in fullscreen mode
