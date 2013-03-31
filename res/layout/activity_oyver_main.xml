@@ -72,14 +72,6 @@
             android:layout_centerVertical="true"
             android:visibility="invisible" />
 
-        <TextView
-            android:id="@+id/error_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/textView1"
-            android:layout_below="@+id/textView1"
-            android:text="" />
-
         <Button
             android:id="@+id/go_button"
             android:layout_width="wrap_content"
@@ -92,6 +84,14 @@
             android:paddingRight="48dp"
             android:enabled="false"
             android:text="@string/go" />
+
+        <TextView
+            android:id="@+id/error_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />
+
     </RelativeLayout>
 
 </RelativeLayout>

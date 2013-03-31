@@ -78,7 +78,7 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 			populateTalks(talkSpinner);
 		}
 		else {
-			errorMessage = "Problem downloading talk list. Please try later.\n" + lastError;
+			errorMessage = "Could not download talks. Check settings.";
 			talkSpinner.setVisibility(View.INVISIBLE);
 		}
 
@@ -116,7 +116,6 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 		
 		try{
 			final InputStream source = CustomHTTPClient.retrieveStream(location);
-
 			final Reader reader = new InputStreamReader(source);
 			final BufferedReader bir = new BufferedReader(reader);
 
