@@ -10,8 +10,12 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import android.app.Activity;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
+import android.widget.Toast;
 
 public class Voter implements Runnable {
 
@@ -19,7 +23,7 @@ public class Voter implements Runnable {
 
 	private Context ctx = null;
 
-	private Deque<Vote> votes = new ArrayDeque<Vote>();
+	private Deque<Vote> votes;
 	private boolean running = true;
 
 	private static final String SERIAL_FILENAME = "votes";
@@ -27,12 +31,16 @@ public class Voter implements Runnable {
 	private static final String TAG = "OyVer Voter";
 
 	public Voter(Context c){
-		this.ctx = c;
+		this.ctx = c;		
+		synchronized(Voter.class){
+			votes = new ArrayDeque<Vote>();
+		}
+		
 		deserialiseVotes();
 	}
 
 	public void queueVote(Vote v) {
-		synchronized(this){
+		synchronized(Voter.class){
 			votes.add(v);
 		}
 	}
@@ -47,7 +55,7 @@ public class Voter implements Runnable {
 	}
 
 	private void deserialiseVotes(){
-		synchronized(this){
+		synchronized(Voter.class){
 			boolean found = false;
 			for(String s: ctx.fileList()){
 				if(s.equals(SERIAL_FILENAME)){
@@ -92,31 +100,48 @@ public class Voter implements Runnable {
 
 		while(running){
 			try {
-				Thread.sleep(200);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 
-			if(!votes.isEmpty()){
-				if(votes.peek().getNumberOfAttempts() > Voter.MAX_ATTEMPTS){
-					votes.pop();
-				}
+			synchronized(Voter.class){
+				if(!votes.isEmpty()){
+					ConnectivityManager cm = (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+					NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
-				if(sendVote(votes.peek())){
-					Log.v(TAG, "SENDING " + votes.peek().getUrl());
-					votes.pop();
+					boolean isConnected = !(activeNetwork == null) && activeNetwork.isConnectedOrConnecting();
+
+					if(isConnected){
+						if(sendVote(votes.peek())){
+							Log.v(TAG, "SENDING " + votes.peek().getUrl());
+							votes.pop();
+						}
+						else{
+							Log.v(TAG, "Incrementing attempt counter");
+							votes.peek().incrementAttempts();
+						}			
+					}
+
+					if(!votes.isEmpty() && votes.peek().getNumberOfAttempts() > Voter.MAX_ATTEMPTS){
+						Log.v(TAG, "MAX ATTEMPTS REACHED");
+						((Activity)ctx).runOnUiThread(new Runnable() {
+							public void run() {
+								Toast.makeText(((Activity)ctx), ctx.getString(R.string.voting_problem), Toast.LENGTH_SHORT).show();
+							}
+						});
+
+						votes.pop();
+					}
 				}
-				else{
-					votes.peek().incrementAttempts();
-				}			
 			}
 		}
-		//stopped, serialise what we havent sent yet
+		//stopped, serialise what we haven't sent yet
 		serialiseVotes();
 	}
 
 	private void serialiseVotes(){
-		synchronized(this){
+		synchronized(Voter.class){
 			if(!votes.isEmpty()){
 				Log.v(TAG, "Serialising votes");
 
