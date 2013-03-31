@@ -8,6 +8,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
@@ -17,18 +18,25 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
+
+import android.util.Log;
 /**
  * Provides a single, shared, thread-safe HTTPClient.
  */
 public final class CustomHTTPClient {
-	private static HttpClient customHttpClient;
+	private static final String TAG = "OyVer HTTP Client";
+	private static AbstractHttpClient customHttpClient;
+	private static HttpRequestRetryHandler requestRetryHandler;
 
 	/** A private Constructor prevents any other class from instantiating. */
 	private CustomHTTPClient() {
@@ -65,6 +73,26 @@ public final class CustomHTTPClient {
 			final ClientConnectionManager conMgr = new ThreadSafeClientConnManager(params,schReg);
 
 			customHttpClient = new DefaultHttpClient(conMgr, params);
+			requestRetryHandler = new DefaultHttpRequestRetryHandler(5, false){
+
+				@Override
+				public boolean retryRequest(IOException ex, int count, HttpContext cx) {
+					if(super.retryRequest(ex, count, cx)){
+						Log.d(TAG, "Retrying request " + cx.toString());
+						try {
+							Thread.sleep(2000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						return true;
+					}
+					else{
+						return false;
+					}
+				}
+			};
+			
+			customHttpClient.setHttpRequestRetryHandler(requestRetryHandler);
 		}
 		return customHttpClient;
 	}
