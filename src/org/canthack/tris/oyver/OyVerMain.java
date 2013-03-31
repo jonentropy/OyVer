@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,15 +52,20 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		}
 
 		Spinner talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
+		final Button goButton = (Button) this.findViewById(R.id.go_button);
+				
 		talkSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> arg0, View arg1,
 					int i, long l) {
+				
 				if(i > 0){ //0 is for the "select session" line. Also explains -1s below :-)
 
 					selectedTalkId = talkDLTask.getTalkIds().get(i-1);
 					selectedTalkTitle = talkDLTask.getTalks().talks.get(i-1).title;
+					
+					goButton.setEnabled(true);
 
 					Log.v(TAG, "SELECTED " + i + "." + l + "." + selectedTalkId);
 					Log.v(TAG, "SEL: " + selectedTalkTitle);
@@ -67,6 +73,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 				else{
 					selectedTalkId = -1;
 					selectedTalkTitle = "";
+					goButton.setEnabled(false);
 				}
 			}
 
@@ -175,6 +182,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	}
 
 	public void voteButtonClick(View v){
+		Log.v(TAG, "voting on " + selectedTalkId);
 		if(selectedTalkId < 0)
 			return;
 				
@@ -223,7 +231,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		boolean isConnected = !(activeNetwork == null) && activeNetwork.isConnectedOrConnecting();
 
 		if(!isConnected){
-			Toast.makeText(getApplicationContext(), this.getString(R.string.no_internet), Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), this.getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
 		}
 		else{
 			talkDLTask = new TalkDownloadTask(this);
