@@ -74,7 +74,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			downloadTalks();
 		}
 
-		Spinner talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
+		final Spinner talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
 		final Button goButton = (Button) this.findViewById(R.id.go_button);
 
 		talkSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -108,6 +108,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 		if (savedInstanceState != null){
 			selectedTalkId = savedInstanceState.getInt("selectedtalk");
+			talkSpinner.setSelection(savedInstanceState.getInt("spinnerSel"));
 			selectedTalkTitle = savedInstanceState.getString("selectedtalkname");
 			fullscreen = savedInstanceState.getBoolean("guimode");
 		}
@@ -118,6 +119,10 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		super.onSaveInstanceState(bund);
 		bund.putBoolean("guimode", fullscreen);
 		bund.putInt("selectedtalk", selectedTalkId);
+		
+		final Spinner talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
+		bund.putInt("spinnerSel", talkSpinner.getSelectedItemPosition());
+		
 		bund.putString("selectedtalkname", selectedTalkTitle);
 	}
 
