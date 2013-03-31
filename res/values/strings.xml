@@ -14,5 +14,6 @@
     <string name="default_hostname">http://</string>
     <string name="server_string">Talks location</string>
     <string name="vote_server_string">Voting location</string>
+    <string name="voting_problem">Problem voting, vote lost. Check settings.</string>
 
 </resources>

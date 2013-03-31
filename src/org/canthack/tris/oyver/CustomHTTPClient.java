@@ -91,7 +91,7 @@ public final class CustomHTTPClient {
 					}
 				}
 			};
-			
+
 			customHttpClient.setHttpRequestRetryHandler(requestRetryHandler);
 		}
 		return customHttpClient;
@@ -102,34 +102,42 @@ public final class CustomHTTPClient {
 	 * the URL cannot be found or times out.
 	 */
 	public static synchronized InputStream retrieveStream(final String url) {
-		if(url == null || url.length() <= 4){
+		if(url == null || url.length() <= 7){
 			return null;
 		}
 
-		final HttpGet getRequest = new HttpGet(url);
+		HttpGet getRequest;
 
-		try {
-			final HttpResponse response = CustomHTTPClient.getHttpClient().execute(getRequest);
-			if(response == null) return null;
-			
-			final int statusCode = response.getStatusLine().getStatusCode();
+		try{
+			getRequest = new HttpGet(url);
 
-			if (statusCode != HttpStatus.SC_OK) { 
-				return null;
+			try {
+				final HttpResponse response = CustomHTTPClient.getHttpClient().execute(getRequest);
+				if(response == null) return null;
+
+				final int statusCode = response.getStatusLine().getStatusCode();
+
+				if (statusCode != HttpStatus.SC_OK) { 
+					return null;
+				}
+
+				final HttpEntity getResponseEntity = response.getEntity();
+				if(getResponseEntity == null) return null;
+
+				final InputStream s = getResponseEntity.getContent();
+
+				return s;
+			} 
+			catch (IOException e) {
+				getRequest.abort();
+			}
+			catch(IllegalStateException e){
+				getRequest.abort();
 			}
 
-			final HttpEntity getResponseEntity = response.getEntity();
-			if(getResponseEntity == null) return null;
-
-			final InputStream s = getResponseEntity.getContent();
-
-			return s;
-		} 
-		catch (IOException e) {
-			getRequest.abort();
 		}
-		catch(IllegalStateException e){
-			getRequest.abort();
+		catch(Exception e){
+			return null;
 		}
 
 		return null;
