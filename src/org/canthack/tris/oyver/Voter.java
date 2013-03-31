@@ -100,7 +100,7 @@ public class Voter implements Runnable {
 
 		while(running){
 			try {
-				Thread.sleep(50);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

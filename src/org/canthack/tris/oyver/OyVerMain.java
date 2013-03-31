@@ -25,18 +25,28 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 public class OyVerMain extends Activity implements OnSharedPreferenceChangeListener {
 	private static final String TAG = "OyVer Main";
 
 	private boolean fullscreen = false;
-	
-	private Voter voter;
-	private TalkDownloadTask talkDLTask;
+
+	//private Voter voter;
+	static class NonConfigurationObject{
+
+		TalkDownloadTask talkDLTask;
+		Voter voter;
+		Thread voterThread;
+
+	}
+	//	private TalkDownloadTask talkDLTask;
+
+	private NonConfigurationObject nco;
 
 	private int selectedTalkId = -1;
 	private String selectedTalkTitle = "";
 
-	private static Thread voterThread;
+	//private static Thread voterThread;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -44,29 +54,46 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_oyver_main);
 
-		if( (talkDLTask = (TalkDownloadTask)getLastNonConfigurationInstance()) != null) {
-			talkDLTask.setContext(this); 
-			if(talkDLTask.getStatus() == AsyncTask.Status.FINISHED)
-				talkDLTask.populateTalks((Spinner)this.findViewById(R.id.spinner1));
+
+		if( (nco = (NonConfigurationObject)getLastNonConfigurationInstance()) != null) {
+			
+			if( nco.talkDLTask != null) {
+				nco.talkDLTask.setContext(this); 
+				if(nco.talkDLTask.getStatus() == AsyncTask.Status.FINISHED)
+					nco.talkDLTask.populateTalks((Spinner)this.findViewById(R.id.spinner1));
+			}
+			else{
+				downloadTalks();
+			}
+
+			if(nco.voter != null){
+				nco.voter.setContext(this);
+			}
 		}
 		else{
+			nco = new NonConfigurationObject();
+			
+			nco.voter = new Voter(this);
+			nco.voterThread = new Thread(null, nco.voter, "Voter");
+			nco.voterThread.start();
+			
 			downloadTalks();
 		}
 
 		Spinner talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
 		final Button goButton = (Button) this.findViewById(R.id.go_button);
-				
+
 		talkSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> arg0, View arg1,
 					int i, long l) {
-				
+
 				if(i > 0){ //0 is for the "select session" line. Also explains -1s below :-)
 
-					selectedTalkId = talkDLTask.getTalkIds().get(i-1);
-					selectedTalkTitle = talkDLTask.getTalks().talks.get(i-1).title;
-					
+					selectedTalkId = nco.talkDLTask.getTalkIds().get(i-1);
+					selectedTalkTitle = nco.talkDLTask.getTalks().talks.get(i-1).title;
+
 					goButton.setEnabled(true);
 
 					Log.v(TAG, "SELECTED " + i + "." + l + "." + selectedTalkId);
@@ -131,10 +158,6 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(this);
-		
-		voter = new Voter(this);
-		voterThread = new Thread(null, voter, "Voter");
-		voterThread.start();
 	}
 
 	@Override
@@ -142,7 +165,6 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(this);
 		
-		voter.stop();
 		super.onPause();
 	}
 
@@ -195,14 +217,14 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		Log.v(TAG, "voting on " + selectedTalkId);
 		if(selectedTalkId < 0)
 			return;
-				
+
 		ObjectAnimator animator = ObjectAnimator.ofFloat(v, "alpha", 0.2f, 1f);
 
 		animator.setDuration(300);
 		animator.start();	
-		
+
 		Vote vote = null; 
-		
+
 		switch(v.getId()){
 		case R.id.yay_button:
 			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.YAY);
@@ -216,13 +238,13 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.NAY);
 			break;
 		}
-		
-		voter.queueVote(vote);
+
+		nco.voter.queueVote(vote);
 	}
 
 	private void downloadTalks(){
-		if(talkDLTask != null) {
-			AsyncTask.Status diStatus = talkDLTask.getStatus();
+		if(nco.talkDLTask != null) {
+			AsyncTask.Status diStatus = nco.talkDLTask.getStatus();
 
 			if(diStatus != AsyncTask.Status.FINISHED) {
 				Log.v(TAG, "Talks already downloading.");
@@ -240,10 +262,10 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			Toast.makeText(getApplicationContext(), this.getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
 		}
 		else{
-			talkDLTask = new TalkDownloadTask(this);
+			nco.talkDLTask = new TalkDownloadTask(this);
 
 			try{
-				talkDLTask.execute(Settings.getServerAddress(this));
+				nco.talkDLTask.execute(Settings.getServerAddress(this));
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -256,7 +278,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	// to our AsyncTask.
 	@Override
 	public Object onRetainNonConfigurationInstance() {
-		return talkDLTask;
+		return nco;
 	}
 
 	@Override
