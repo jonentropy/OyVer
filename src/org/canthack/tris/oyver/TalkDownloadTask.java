@@ -147,10 +147,4 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 	public ListTalksResponse getTalks(){
 		return downloadedTalks;
 	}
-
-	public void populateTalks() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

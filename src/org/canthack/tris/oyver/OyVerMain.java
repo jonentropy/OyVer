@@ -30,6 +30,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	private boolean fullscreen = false;
 
 	private TalkDownloadTask talkDLTask;
+	private Voter voter = new Voter();
 
 	private int selectedTalkId = -1;
 	private String selectedTalkTitle = "";
@@ -174,29 +175,35 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	}
 
 	public void voteButtonClick(View v){
+		if(selectedTalkId < 0)
+			return;
 				
 		ObjectAnimator animator = ObjectAnimator.ofFloat(v, "alpha", 0.2f, 1f);
 
 		animator.setDuration(300);
 		animator.start();	
 		
+		Vote vote = null; 
+		
 		switch(v.getId()){
 		case R.id.yay_button:
-			//TODO queue votes here...
+			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.YAY);
 
 			break;
 
 		case R.id.meh_button:
-
+			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.MEH);
 
 			break;
 
 		case R.id.nay_button:
-
+			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.NAY);
 
 			break;
 
 		}
+		
+		voter.queueVote(vote);
 	}
 
 	private void downloadTalks(){
