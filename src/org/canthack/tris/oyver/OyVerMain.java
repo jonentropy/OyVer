@@ -288,6 +288,17 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			setGuiMode();
 		}
 		else{
+			Log.v(TAG, "Back pressed");
+			if(nco != null && nco.voter != null&& nco.voterThread != null){
+				Log.v(TAG, "Stopping threads");
+				nco.voter.stop();
+				try {
+					nco.voterThread.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}	
+			}
+			
 			super.onBackPressed();
 		}
 	}
