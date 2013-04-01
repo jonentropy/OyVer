@@ -18,6 +18,7 @@
             android:background="#00FF00"
             android:layout_marginRight="2dp" 
             android:onClick="voteButtonClick"
+            android:textSize="48dp"
             android:text="@string/yay" />
 
         <Button
@@ -29,6 +30,7 @@
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
             android:onClick="voteButtonClick"
+            android:textSize="48dp"
             android:text="@string/meh" />
 
         <Button
@@ -39,6 +41,7 @@
             android:background="#FF1919"
             android:layout_marginLeft="2dp"
             android:onClick="voteButtonClick"
+            android:textSize="48dp"
             android:text="@string/nay" />
     </LinearLayout>
 
