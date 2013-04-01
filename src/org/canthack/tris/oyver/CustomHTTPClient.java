@@ -37,6 +37,7 @@ public final class CustomHTTPClient {
 	private static final String TAG = "OyVer HTTP Client";
 	private static AbstractHttpClient customHttpClient;
 	private static HttpRequestRetryHandler requestRetryHandler;
+	private static final int MIN_URL_LENGTH = 18; //Specific to Oy. URL should be ignored if shorter.
 
 	/** A private Constructor prevents any other class from instantiating. */
 	private CustomHTTPClient() {
@@ -102,7 +103,7 @@ public final class CustomHTTPClient {
 	 * the URL cannot be found or times out.
 	 */
 	public static synchronized InputStream retrieveStream(final String url) {
-		if(url == null || url.length() <= 7){
+		if(url == null || url.length() <= MIN_URL_LENGTH){
 			return null;
 		}
 
