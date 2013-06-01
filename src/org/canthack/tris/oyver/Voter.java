@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,26 +24,23 @@ public class Voter implements Runnable {
 
 	private Context ctx = null;
 
-	private Deque<Vote> votes;
+	private Queue<Vote> votes;
 	private boolean running = true;
 
 	public Voter(Context c){
 		this.ctx = c;		
-		synchronized(Voter.class){
-			votes = new ArrayDeque<Vote>();
-		}
-		
+
+		votes = new LinkedBlockingQueue<Vote>();
+
 		deserialiseVotes();
 	}
 
 	public void queueVote(Vote v) {
-		synchronized(Voter.class){
-			votes.add(v);
-		}
+		votes.add(v);
 	}
 
 	public void stop(){
-		Log.v(TAG, "Stopping");
+		Log.v(TAG, "Voter Stopping");
 		running = false;
 	}
 
@@ -74,7 +71,7 @@ public class Voter implements Runnable {
 				try {
 					ObjectInputStream os = new ObjectInputStream(fis);
 					try {
-						votes = (Deque<Vote>) os.readObject();
+						votes = (Queue<Vote>) os.readObject();
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 						Log.v(TAG, "Couldnt deserialise file.");
@@ -93,7 +90,7 @@ public class Voter implements Runnable {
 
 	@Override
 	public void run() {
-		Log.v(TAG, "Starting");
+		Log.v(TAG, "Voter Run Starting");
 
 		while(running){
 			try {
@@ -102,34 +99,32 @@ public class Voter implements Runnable {
 				e.printStackTrace();
 			}
 
-			synchronized(Voter.class){
-				if(!votes.isEmpty()){
-					ConnectivityManager cm = (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-					NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+			if(!votes.isEmpty()){
+				ConnectivityManager cm = (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+				NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
-					boolean isConnected = !(activeNetwork == null) && activeNetwork.isConnectedOrConnecting();
+				boolean isConnected = !(activeNetwork == null) && activeNetwork.isConnectedOrConnecting();
 
-					if(isConnected){
-						if(sendVote(votes.peek())){
-							Log.v(TAG, "SENDING " + votes.peek().getUrl());
-							votes.pop();
+				if(isConnected){
+					if(sendVote(votes.peek())){
+						Log.v(TAG, "SENDING " + votes.peek().getUrl());
+						votes.poll();
+					}
+					else{
+						Log.v(TAG, "Incrementing attempt counter");
+						votes.peek().incrementAttempts();
+					}			
+				}
+
+				if(!votes.isEmpty() && votes.peek().getNumberOfAttempts() > Voter.MAX_ATTEMPTS){
+					Log.v(TAG, "MAX ATTEMPTS REACHED");
+					((Activity)ctx).runOnUiThread(new Runnable() {
+						public void run() {
+							Toast.makeText(((Activity)ctx), ctx.getString(R.string.voting_problem), Toast.LENGTH_SHORT).show();
 						}
-						else{
-							Log.v(TAG, "Incrementing attempt counter");
-							votes.peek().incrementAttempts();
-						}			
-					}
+					});
 
-					if(!votes.isEmpty() && votes.peek().getNumberOfAttempts() > Voter.MAX_ATTEMPTS){
-						Log.v(TAG, "MAX ATTEMPTS REACHED");
-						((Activity)ctx).runOnUiThread(new Runnable() {
-							public void run() {
-								Toast.makeText(((Activity)ctx), ctx.getString(R.string.voting_problem), Toast.LENGTH_SHORT).show();
-							}
-						});
-
-						votes.pop();
-					}
+					votes.poll();
 				}
 			}
 		}

@@ -1,6 +1,8 @@
 package org.canthack.tris.oyver;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -22,13 +24,14 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class OyVerMain extends Activity implements OnSharedPreferenceChangeListener {
 	private static final String TAG = "OyVer Main";
 
 	private boolean fullscreen = false;
+	
+	private ExecutorService exe = Executors.newCachedThreadPool();
 
 	static class NonConfigurationObject{
 		TalkDownloadTask talkDLTask;
@@ -205,14 +208,14 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		}
 	}
 
-	public void startVoting(View v){
+	public void startVoting(final View v){
 		if(selectedTalkId >= 0){
 			fullscreen = true;
 			setGuiMode();
 		}
 	}
 
-	public void voteButtonClick(View v){
+	public void voteButtonClick(final View v){
 		Log.v(TAG, "voting on " + selectedTalkId);
 		if(selectedTalkId < 0)
 			return;
@@ -222,23 +225,32 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		animator.setDuration(300);
 		animator.start();	
 
-		Vote vote = null; 
+		Runnable voteRunnable = new Runnable(){
+			@Override
+			public void run() {
+				Vote vote = null; 
 
-		switch(v.getId()){
-		case R.id.yay_button:
-			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.YAY);
-			break;
+				switch(v.getId()){
+				case R.id.yay_button:
+					vote = new Vote(Settings.getVotingServerAddress(getBaseContext()), selectedTalkId, Vote.YAY);
+					break;
 
-		case R.id.meh_button:
-			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.MEH);
-			break;
+				case R.id.meh_button:
+					vote = new Vote(Settings.getVotingServerAddress(getBaseContext()), selectedTalkId, Vote.MEH);
+					break;
 
-		case R.id.nay_button:
-			vote = new Vote(Settings.getVotingServerAddress(this), selectedTalkId, Vote.NAY);
-			break;
-		}
-
-		nco.voter.queueVote(vote);
+				case R.id.nay_button:
+					vote = new Vote(Settings.getVotingServerAddress(getBaseContext()), selectedTalkId, Vote.NAY);
+					break;
+				}
+				
+				if(vote != null){
+					nco.voter.queueVote(vote);
+				}
+			}	
+		};
+		
+		exe.execute(voteRunnable);
 	}
 
 	private void downloadTalks(){
@@ -294,14 +306,12 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		}
 		else{
 			Log.v(TAG, "Back pressed");
-			if(nco != null && nco.voter != null&& nco.voterThread != null){
+			if(nco != null && nco.voter != null && nco.voterThread != null){
 				Log.v(TAG, "Stopping threads");
 				nco.voter.stop();
 				try {
 					nco.voterThread.join();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}	
+				} catch (InterruptedException e) {}
 			}
 			
 			super.onBackPressed();
