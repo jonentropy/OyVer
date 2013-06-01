@@ -191,6 +191,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		if(fullscreen){
 			for(View v: normalViews) v.setVisibility(View.GONE);
 
+			getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 			getActionBar().hide();
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);	
@@ -200,6 +201,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		else{
 			for(View v: fsViews) v.setVisibility(View.GONE);
 
+			getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			getActionBar().show();
 			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
