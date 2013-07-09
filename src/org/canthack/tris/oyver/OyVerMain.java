@@ -32,6 +32,16 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	private boolean fullscreen = false;
 	
 	private ExecutorService exe = Executors.newCachedThreadPool();
+	
+	private View mainLayout;
+	private Spinner talkSpinner;
+	private Button goButton;
+
+	//views that are only to be displayed in fullscreen mode
+	private final ArrayList<View> fsViews = new ArrayList<View>();
+
+	//views that are only to be displayed in non fullscreen mode
+	private final ArrayList<View> normalViews = new ArrayList<View>();
 
 	static class NonConfigurationObject{
 		TalkDownloadTask talkDLTask;
@@ -49,7 +59,18 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_oyver_main);
+		
+		mainLayout = this.findViewById(android.R.id.content).getRootView();
+		talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
+		goButton = (Button) this.findViewById(R.id.go_button);
 
+		fsViews.add(this.findViewById(R.id.yay_button));
+		fsViews.add(this.findViewById(R.id.meh_button));
+		fsViews.add(this.findViewById(R.id.nay_button));
+
+		normalViews.add(this.findViewById(R.id.textView1));
+		normalViews.add(this.findViewById(R.id.spinner1));
+		normalViews.add(this.findViewById(R.id.go_button));
 
 		if( (nco = (NonConfigurationObject)getLastNonConfigurationInstance()) != null) {
 			
@@ -77,11 +98,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			downloadTalks();
 		}
 
-		final Spinner talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
-		final Button goButton = (Button) this.findViewById(R.id.go_button);
-
 		talkSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
 			@Override
 			public void onItemSelected(AdapterView<?> arg0, View arg1,
 					int i, long l) {
@@ -122,10 +139,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		super.onSaveInstanceState(bund);
 		bund.putBoolean("guimode", fullscreen);
 		bund.putInt("selectedtalk", selectedTalkId);
-		
-		final Spinner talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
 		bund.putInt("spinnerSel", talkSpinner.getSelectedItemPosition());
-		
 		bund.putString("selectedtalkname", selectedTalkTitle);
 	}
 
@@ -172,27 +186,11 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 	@SuppressLint("NewApi")
 	private void setGuiMode(){
-		View main_layout = this.findViewById(android.R.id.content).getRootView();
-
-		//views that are only to be displayed in fullscreen mode
-		ArrayList<View> fsViews = new ArrayList<View>();
-
-		fsViews.add(this.findViewById(R.id.yay_button));
-		fsViews.add(this.findViewById(R.id.meh_button));
-		fsViews.add(this.findViewById(R.id.nay_button));
-
-		//views that are only to be displayed in non fullscreen mode
-		ArrayList<View> normalViews = new ArrayList<View>();
-
-		normalViews.add(this.findViewById(R.id.textView1));
-		normalViews.add(this.findViewById(R.id.spinner1));
-		normalViews.add(this.findViewById(R.id.go_button));
-
 		if(fullscreen){
 			for(View v: normalViews) v.setVisibility(View.GONE);
 
 			getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+			mainLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 			getActionBar().hide();
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);	
 
@@ -204,7 +202,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			getActionBar().show();
 			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			main_layout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
+			mainLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
 
 			for(View v: normalViews) v.setVisibility(View.VISIBLE);
 		}
