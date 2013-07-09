@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import org.canthack.tris.oyver.model.json.ListTalksResponse;
 import org.canthack.tris.oyver.model.json.Talk;
 
-import com.google.gson.Gson;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -19,7 +17,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksResponse>{
 
@@ -35,6 +35,9 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 		mContext = context;
 	}
 
+	public boolean downloadedOk(){
+		return downloadedTalks != null;
+	}
 	// Called from main thread to re-attach
 	protected void setContext(Context context) {
 		mContext = context;
@@ -46,8 +49,7 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 	protected void onPreExecute() {
 		progress = 0;
 		Spinner talkSpinner = (Spinner) ((Activity) mContext).findViewById(R.id.spinner1);
-		talkSpinner.setVisibility(View.INVISIBLE);
-		
+		talkSpinner.setVisibility(View.INVISIBLE);	
 	}
 
 	protected ListTalksResponse doInBackground(String ... location) {
@@ -69,7 +71,6 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 	}
 
 	protected void onPostExecute(ListTalksResponse result) {
-		String errorMessage = "";
 		Spinner talkSpinner = (Spinner) ((Activity) mContext).findViewById(R.id.spinner1);
 
 		if(result != null) {
@@ -79,14 +80,9 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 			populateTalks(talkSpinner);
 		}
 		else {
-			errorMessage = mContext.getString(R.string.error_downloading_talks);
+			Toast.makeText(mContext.getApplicationContext(), mContext.getString(R.string.error_downloading_talks), Toast.LENGTH_SHORT).show();
 			talkSpinner.setVisibility(View.INVISIBLE);
 		}
-
-		TextView errorMsg = (TextView)
-				((Activity) mContext).findViewById(R.id.error_text);
-
-		errorMsg.setText(errorMessage);	
 	}
 	
 	public void populateTalks(Spinner s){

@@ -4,11 +4,6 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Bundle;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -16,6 +11,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -69,15 +69,14 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		fsViews.add(this.findViewById(R.id.nay_button));
 
 		normalViews.add(this.findViewById(R.id.textView1));
-		normalViews.add(this.findViewById(R.id.spinner1));
-		normalViews.add(this.findViewById(R.id.go_button));
+		normalViews.add(goButton);
 
 		if( (nco = (NonConfigurationObject)getLastNonConfigurationInstance()) != null) {
 			
 			if( nco.talkDLTask != null) {
 				nco.talkDLTask.setContext(this); 
 				if(nco.talkDLTask.getStatus() == AsyncTask.Status.FINISHED)
-					nco.talkDLTask.populateTalks((Spinner)this.findViewById(R.id.spinner1));
+					nco.talkDLTask.populateTalks(talkSpinner);
 			}
 			else{
 				downloadTalks();
@@ -110,8 +109,8 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 					goButton.setEnabled(true);
 
-					Log.v(TAG, "SELECTED " + i + "." + l + "." + selectedTalkId);
-					Log.v(TAG, "SEL: " + selectedTalkTitle);
+					Log.v(TAG, "SELECTED ID: " + i + "." + l + "." + selectedTalkId);
+					Log.v(TAG, "SELECTED TITLE: " + selectedTalkTitle);
 				}
 				else{
 					selectedTalkId = -1;
@@ -173,13 +172,13 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		setGuiMode();
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		preferences.registerOnSharedPreferenceChangeListener(this);
+		preferences.unregisterOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
 	protected void onPause(){
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		preferences.unregisterOnSharedPreferenceChangeListener(this);
+		preferences.registerOnSharedPreferenceChangeListener(this);
 		
 		super.onPause();
 	}
@@ -188,6 +187,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	private void setGuiMode(){
 		if(fullscreen){
 			for(View v: normalViews) v.setVisibility(View.GONE);
+			talkSpinner.setVisibility(View.INVISIBLE);
 
 			getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			mainLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
@@ -205,6 +205,13 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			mainLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
 
 			for(View v: normalViews) v.setVisibility(View.VISIBLE);
+			if(nco.talkDLTask.downloadedOk()){
+				talkSpinner.setVisibility(View.VISIBLE);
+			}
+			else{
+				talkSpinner.setVisibility(View.INVISIBLE);
+				goButton.setEnabled(false);
+			}
 		}
 	}
 

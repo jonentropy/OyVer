@@ -14,35 +14,35 @@
             android:id="@+id/yay_button"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
+            android:layout_marginRight="2dp"
             android:layout_weight="0.3"
             android:background="#00FF00"
-            android:layout_marginRight="2dp" 
             android:onClick="voteButtonClick"
-            android:textSize="48dp"
-            android:text="@string/yay" />
+            android:text="@string/yay"
+            android:textSize="48dp" />
 
         <Button
             android:id="@+id/meh_button"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:layout_weight="0.3"
-            android:background="#FFFF33"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
+            android:layout_weight="0.3"
+            android:background="#FFFF33"
             android:onClick="voteButtonClick"
-            android:textSize="48dp"
-            android:text="@string/meh" />
+            android:text="@string/meh"
+            android:textSize="48dp" />
 
         <Button
             android:id="@+id/nay_button"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
+            android:layout_marginLeft="2dp"
             android:layout_weight="0.3"
             android:background="#FF1919"
-            android:layout_marginLeft="2dp"
             android:onClick="voteButtonClick"
-            android:textSize="48dp"
-            android:text="@string/nay" />
+            android:text="@string/nay"
+            android:textSize="48dp" />
     </LinearLayout>
 
     <RelativeLayout
@@ -82,19 +82,11 @@
             android:layout_below="@+id/spinner1"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
+            android:enabled="false"
             android:onClick="startVoting"
             android:paddingLeft="48dp"
             android:paddingRight="48dp"
-            android:enabled="false"
             android:text="@string/go" />
-
-        <TextView
-            android:id="@+id/error_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true" />
-
     </RelativeLayout>
 
 </RelativeLayout>
