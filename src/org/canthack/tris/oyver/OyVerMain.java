@@ -165,7 +165,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	@Override
 	protected void onPause(){
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		preferences.registerOnSharedPreferenceChangeListener(this);
+		preferences.unregisterOnSharedPreferenceChangeListener(this);
 		
 		super.onPause();
 	}
