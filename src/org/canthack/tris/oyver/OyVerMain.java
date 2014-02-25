@@ -205,7 +205,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			mainLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
 
 			for(View v: normalViews) v.setVisibility(View.VISIBLE);
-			if(nco.talkDLTask.downloadedOk()){
+			if(nco != null && nco.talkDLTask != null && nco.talkDLTask.downloadedOk()){
 				talkSpinner.setVisibility(View.VISIBLE);
 			}
 			else{
