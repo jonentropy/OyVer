@@ -24,6 +24,8 @@ public class Voter implements Runnable {
 	private Context ctx = null;
 	private boolean running = true;
 	private OyVerApp app;
+	private long lastSerialisedTime;
+	private static final long SERIALISE_PERIOD = 10l * 1000l * 1000l * 1000l; //10 seconds.
 
 	public Voter(Context c, OyVerApp app){
 		this.ctx = c;		
@@ -108,6 +110,13 @@ public class Voter implements Runnable {
 						notifyVoteQueueChanged();
 					}		
 				}
+				else{
+					//periodically serialise votes just in case...
+					if(System.nanoTime() > lastSerialisedTime + SERIALISE_PERIOD){
+						serialiseVotes();
+						lastSerialisedTime = System.nanoTime();
+					}
+				}
 			}
 		}
 		//stopped, serialise what we haven't sent yet
@@ -153,7 +162,7 @@ public class Voter implements Runnable {
 
 	private boolean sendVote(Vote v) {
 		if(v == null) return false;
-		
+
 		InputStream s = CustomHTTPClient.retrieveStream(v.getUrl());	
 		if(s == null) return false;
 
