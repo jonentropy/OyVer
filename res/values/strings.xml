@@ -9,7 +9,7 @@
     <string name="yay">:)</string>
     <string name="meh">:|</string>
     <string name="nay">:(</string>
-    <string name="no_internet">No internet connection</string>
+    <string name="no_internet">No internet connection, using offline mode</string>
     <string name="settings_title">Settings</string>
     <string name="default_hostname">http://</string>
     <string name="server_string">Talks location</string>

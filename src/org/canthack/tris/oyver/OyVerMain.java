@@ -30,9 +30,9 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	private static final String TAG = "OyVer Main";
 
 	private boolean fullscreen = false;
-	
+
 	private ExecutorService exe = Executors.newCachedThreadPool();
-	
+
 	private View mainLayout;
 	private Spinner talkSpinner;
 	private Button goButton;
@@ -48,7 +48,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		Voter voter;
 		Thread voterThread;
 	}
-	
+
 	private NonConfigurationObject nco;
 
 	private int selectedTalkId = -1;
@@ -59,7 +59,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_oyver_main);
-		
+
 		mainLayout = this.findViewById(android.R.id.content).getRootView();
 		talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
 		goButton = (Button) this.findViewById(R.id.go_button);
@@ -72,7 +72,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		normalViews.add(goButton);
 
 		if( (nco = (NonConfigurationObject)getLastNonConfigurationInstance()) != null) {
-			
+
 			if( nco.talkDLTask != null) {
 				nco.talkDLTask.setContext(this); 
 				if(nco.talkDLTask.getStatus() == AsyncTask.Status.FINISHED)
@@ -89,11 +89,11 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		else{
 			Log.v(TAG, "Making new NCO");
 			nco = new NonConfigurationObject();
-			
+
 			nco.voter = new Voter(this);
 			nco.voterThread = new Thread(null, nco.voter, "Voter");
 			nco.voterThread.start();
-			
+
 			downloadTalks();
 		}
 
@@ -179,7 +179,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	protected void onPause(){
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(this);
-		
+
 		super.onPause();
 	}
 
@@ -250,13 +250,13 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 					vote = new Vote(Settings.getVotingServerAddress(getBaseContext()), selectedTalkId, Vote.NAY);
 					break;
 				}
-				
+
 				if(vote != null){
 					nco.voter.queueVote(vote);
 				}
 			}	
 		};
-		
+
 		exe.execute(voteRunnable);
 	}
 
@@ -276,18 +276,15 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 		boolean isConnected = !(activeNetwork == null) && activeNetwork.isConnectedOrConnecting();
 
-		if(!isConnected){
-			Toast.makeText(getApplicationContext(), this.getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
-		}
-		else{
-			nco.talkDLTask = new TalkDownloadTask(this);
+		if(!isConnected) Toast.makeText(getApplicationContext(), this.getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
 
-			try{
-				nco.talkDLTask.execute(Settings.getServerAddress(this));
-			}
-			catch(Exception e){
-				e.printStackTrace();
-			}
+		nco.talkDLTask = new TalkDownloadTask(this);
+
+		try{
+			nco.talkDLTask.execute(Settings.getServerAddress(this));
+		}
+		catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 
@@ -320,7 +317,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 					nco.voterThread.join();
 				} catch (InterruptedException e) {}
 			}
-			
+
 			super.onBackPressed();
 		}
 	}

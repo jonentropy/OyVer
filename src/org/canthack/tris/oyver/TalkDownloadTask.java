@@ -1,8 +1,11 @@
 package org.canthack.tris.oyver;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.util.ArrayList;
 
@@ -20,6 +23,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
 public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksResponse>{
 
@@ -28,7 +33,8 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 	private ListTalksResponse downloadedTalks = null;
 	private ArrayList<Integer> talkIds = new ArrayList<Integer>();
 	
-	String lastError = "";
+	String lastError;
+	private String SESSIONS_FILENAME = "sessions.json";
 	private static final String TAG = "OyVer DownloadTask";
 
 	TalkDownloadTask(Context context) {
@@ -119,12 +125,31 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 			final Gson gson = new Gson();
 			response = gson.fromJson(bir, ListTalksResponse.class);
 
+			//Save sessions ready for offline use
+			String jsonRepresentation = gson.toJson(response);
+					 
+			FileOutputStream fos = mContext.openFileOutput(SESSIONS_FILENAME, Context.MODE_PRIVATE);
+			fos.write(jsonRepresentation.getBytes());
+			fos.flush();
+			fos.close();
+			
 			bir.close();				
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 			lastError = e.getMessage() + ".";
-			setProgress(-1);
+		}
+		
+		if(lastError != null){
+			//error occurred, try offline JSON
+			final Gson gson = new Gson();
+			try {
+				response = gson.fromJson(new BufferedReader(new InputStreamReader(mContext.openFileInput(SESSIONS_FILENAME))), ListTalksResponse.class);
+				lastError = null;
+			} catch (Exception e){
+				setProgress(-1);
+				lastError = e.getMessage() + ".";
+			}
 		}
 
 		setProgress(100);
