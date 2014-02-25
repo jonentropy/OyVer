@@ -5,12 +5,17 @@
         android:orderInCategory="100"
         android:showAsAction="always"
         android:title="@string/action_refresh"/>
-    
-        <item
+    <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
         android:icon="@android:drawable/ic_menu_preferences"
+        android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:title="@string/settings_title"/>
+    <item
+        android:id="@+id/action_list_votes"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="@string/edit_votes_title"/>
 
 </menu>

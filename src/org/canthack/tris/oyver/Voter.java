@@ -8,11 +8,12 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class Voter implements Runnable {
@@ -21,18 +22,17 @@ public class Voter implements Runnable {
 	public static final int MAX_ATTEMPTS = 10;
 
 	private Context ctx = null;
-
-	private Queue<Vote> votes;
 	private boolean running = true;
+	private OyVerApp app;
 
-	public Voter(Context c){
+	public Voter(Context c, OyVerApp app){
 		this.ctx = c;		
-		votes = new LinkedBlockingQueue<Vote>();
+		this.app = app;
 		deserialiseVotes();
 	}
 
 	public void queueVote(Vote v) {
-		votes.add(v);
+		app.votes.add(v);
 	}
 
 	public void stop(){
@@ -67,7 +67,7 @@ public class Voter implements Runnable {
 				try {
 					ObjectInputStream os = new ObjectInputStream(fis);
 					try {
-						votes = (Queue<Vote>) os.readObject();
+						app.votes = (Queue<Vote>) os.readObject();
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 						Log.v(TAG, "Couldnt deserialise file.");
@@ -95,16 +95,17 @@ public class Voter implements Runnable {
 				e.printStackTrace();
 			}
 
-			if(!votes.isEmpty()){
+			if(!app.votes.isEmpty()){
 				ConnectivityManager cm = (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 				NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
 				boolean isConnected = !(activeNetwork == null) && activeNetwork.isConnectedOrConnecting();
 
 				if(isConnected){
-					if(sendVote(votes.peek())){
-						Log.v(TAG, "Vote sent successfully " + votes.peek().getUrl());
-						votes.poll();
+					if(sendVote(app.votes.peek())){
+						Log.v(TAG, "Vote sent successfully " + app.votes.peek().getUrl());
+						app.votes.poll();
+						notifyVoteQueueChanged();
 					}		
 				}
 			}
@@ -113,9 +114,15 @@ public class Voter implements Runnable {
 		serialiseVotes();
 	}
 
+	private void notifyVoteQueueChanged() {
+		Log.d("Voter", "Broadcasting changed message");
+		Intent intent = new Intent("voteQueueUpdated");
+		LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
+	}
+
 	private void serialiseVotes(){
 		synchronized(Voter.class){
-			if(!votes.isEmpty()){
+			if(!app.votes.isEmpty()){
 				Log.v(TAG, "Serialising votes");
 
 				FileOutputStream fos = null;
@@ -130,7 +137,7 @@ public class Voter implements Runnable {
 
 				try {
 					ObjectOutputStream os = new ObjectOutputStream(fos);
-					os.writeObject(votes);
+					os.writeObject(app.votes);
 					os.flush();
 					os.close();
 

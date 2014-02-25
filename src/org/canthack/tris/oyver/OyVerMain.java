@@ -90,7 +90,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			Log.v(TAG, "Making new NCO");
 			nco = new NonConfigurationObject();
 
-			nco.voter = new Voter(this);
+			nco.voter = new Voter(this, (OyVerApp)getApplication());
 			nco.voterThread = new Thread(null, nco.voter, "Voter");
 			nco.voterThread.start();
 
@@ -158,6 +158,9 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			return true;
 		case R.id.action_settings:
 			startActivity(new Intent(this, Settings.class));
+			return true;
+		case R.id.action_list_votes:
+			startActivity(new Intent(this, VoteListActivity.class));
 			return true;
 		default:
 			break;
@@ -239,15 +242,15 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 				switch(v.getId()){
 				case R.id.yay_button:
-					vote = new Vote(Settings.getVotingServerAddress(getBaseContext()), selectedTalkId, Vote.YAY);
+					vote = new Vote(Settings.getVotingServerAddress(getBaseContext()), selectedTalkId, selectedTalkTitle, Vote.YAY);
 					break;
 
 				case R.id.meh_button:
-					vote = new Vote(Settings.getVotingServerAddress(getBaseContext()), selectedTalkId, Vote.MEH);
+					vote = new Vote(Settings.getVotingServerAddress(getBaseContext()), selectedTalkId, selectedTalkTitle, Vote.MEH);
 					break;
 
 				case R.id.nay_button:
-					vote = new Vote(Settings.getVotingServerAddress(getBaseContext()), selectedTalkId, Vote.NAY);
+					vote = new Vote(Settings.getVotingServerAddress(getBaseContext()), selectedTalkId, selectedTalkTitle, Vote.NAY);
 					break;
 				}
 

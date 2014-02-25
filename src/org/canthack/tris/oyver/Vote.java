@@ -11,7 +11,14 @@ public class Vote implements Serializable{
 
 	private String url = "";
 
-	public Vote(String endpoint, int id, int vt){
+	private String talkName;
+
+	private int voteType;
+
+	public Vote(String endpoint, int id, String name, int vt){
+		this.talkName = name;
+		this.voteType = vt;
+		
 		StringBuilder urlBuilder = new StringBuilder().append(endpoint);
 		if(!endpoint.endsWith("/")) urlBuilder.append('/');
 
@@ -34,5 +41,21 @@ public class Vote implements Serializable{
 
 	public String getUrl(){
 		return url;
+	}
+	
+	public String toString(){
+		StringBuilder builder = new StringBuilder().append(talkName).append(" ");
+		switch(this.voteType){
+		case YAY: 
+			builder.append(":)");
+			break;
+		case MEH: 
+			builder.append(":|");
+			break;
+		case NAY: 
+			builder.append(":(");
+			break;
+		}
+		return builder.toString();
 	}
 }
