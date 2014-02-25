@@ -1,11 +1,9 @@
 package org.canthack.tris.oyver;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.util.ArrayList;
 
@@ -23,8 +21,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
 public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksResponse>{
 

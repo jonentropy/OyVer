@@ -10,12 +10,10 @@ import java.io.ObjectOutputStream;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
-import android.widget.Toast;
 
 public class Voter implements Runnable {
 	private static final String TAG = "OyVer Voter";
@@ -29,9 +27,7 @@ public class Voter implements Runnable {
 
 	public Voter(Context c){
 		this.ctx = c;		
-
 		votes = new LinkedBlockingQueue<Vote>();
-
 		deserialiseVotes();
 	}
 
@@ -107,24 +103,9 @@ public class Voter implements Runnable {
 
 				if(isConnected){
 					if(sendVote(votes.peek())){
-						Log.v(TAG, "SENDING " + votes.peek().getUrl());
+						Log.v(TAG, "Vote sent successfully " + votes.peek().getUrl());
 						votes.poll();
-					}
-					else{
-						Log.v(TAG, "Incrementing attempt counter");
-						votes.peek().incrementAttempts();
-					}			
-				}
-
-				if(!votes.isEmpty() && votes.peek().getNumberOfAttempts() > Voter.MAX_ATTEMPTS){
-					Log.v(TAG, "MAX ATTEMPTS REACHED");
-					((Activity)ctx).runOnUiThread(new Runnable() {
-						public void run() {
-							Toast.makeText(((Activity)ctx), ctx.getString(R.string.voting_problem), Toast.LENGTH_SHORT).show();
-						}
-					});
-
-					votes.poll();
+					}		
 				}
 			}
 		}

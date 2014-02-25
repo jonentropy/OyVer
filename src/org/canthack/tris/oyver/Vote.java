@@ -10,7 +10,6 @@ public class Vote implements Serializable{
 	public static final int NAY = 2;
 
 	private String url = "";
-	private int numberOfAttempts = 0; //The voter will give up after this hits Voter.MAX_ATTEMPTS
 
 	public Vote(String endpoint, int id, int vt){
 		StringBuilder urlBuilder = new StringBuilder().append(endpoint);
@@ -35,14 +34,5 @@ public class Vote implements Serializable{
 
 	public String getUrl(){
 		return url;
-	}
-	
-	public int incrementAttempts(){
-		numberOfAttempts++;
-		return numberOfAttempts;
-	}
-	
-	public int getNumberOfAttempts(){
-		return numberOfAttempts;
 	}
 }
