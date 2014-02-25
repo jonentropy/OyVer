@@ -56,6 +56,8 @@ public class Vote implements Serializable{
 			builder.append(":(");
 			break;
 		}
+		
+		builder.append("\n").append(url);
 		return builder.toString();
 	}
 }

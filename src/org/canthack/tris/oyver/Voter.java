@@ -152,6 +152,8 @@ public class Voter implements Runnable {
 	}
 
 	private boolean sendVote(Vote v) {
+		if(v == null) return false;
+		
 		InputStream s = CustomHTTPClient.retrieveStream(v.getUrl());	
 		if(s == null) return false;
 
