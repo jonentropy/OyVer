@@ -92,7 +92,7 @@ public class VoteListActivity extends Activity {
 		Vote[] voteArray = ((OyVerApp)getApplication()).votes.toArray(new Vote[0]);
 		arrayAdapter = new ArrayAdapter<Vote>(this, android.R.layout.simple_list_item_1, voteArray);
 		lv.setAdapter(arrayAdapter);
-		clearAllItem.setVisible(voteArray.length > 0);
+		if(clearAllItem != null) clearAllItem.setVisible(voteArray != null && voteArray.length > 0);
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class VoteListActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.vote_list, menu);
 		this.clearAllItem = (MenuItem) menu.findItem(R.id.action_clear_all);
-		setAdapter(); //Do this now so that the menu item already exsits.
+		setAdapter(); //Do this now so that the menu item already exists.
 		return true;
 	}
 

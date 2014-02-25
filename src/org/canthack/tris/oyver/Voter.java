@@ -105,9 +105,10 @@ public class Voter implements Runnable {
 				boolean isConnected = !(activeNetwork == null) && activeNetwork.isConnectedOrConnecting();
 
 				if(isConnected){
-					if(sendVote(app.votes.peek())){
-						Log.v(TAG, "Vote sent successfully " + app.votes.peek().getUrl());
-						app.votes.poll();
+					Vote v = app.votes.peek();
+					if(sendVote(v)){
+						Log.d(TAG, "Vote successful: " + v);
+						app.votes.remove(v);
 						notifyVoteQueueChanged();
 					}		
 				}
