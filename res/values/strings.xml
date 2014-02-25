@@ -12,15 +12,14 @@
     <string name="no_internet">No internet connection, using offline mode</string>
     <string name="settings_title">Settings</string>
     <string name="default_hostname">http://</string>
-    <string name="server_string">Talks location</string>
+    <string name="server_string">Sessions location</string>
     <string name="vote_server_string">Voting location</string>
-    <string name="voting_problem">Problem voting, vote lost. Check settings.</string>
-    <string name="error_downloading_talks">Could not download talks. Check settings.</string>
+    <string name="error_downloading_talks">Could not load talks. Check settings.</string>
     <string name="title_activity_vote_list">Pending Votes</string>
-    <string name="action_clear_all">Clear All Pending Votes</string>
+    <string name="action_clear_all">Clear all pending votes</string>
     <string name="edit_votes_title">Edit pending votes</string>
     <string name="are_you_sure_clear">Delete pending vote?</string>
-    <string name="are_you_sure_clear_all">Are you sure you want to cancel all pending votes?</string>
+    <string name="are_you_sure_clear_all">Are you sure you want to delete all pending votes?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 

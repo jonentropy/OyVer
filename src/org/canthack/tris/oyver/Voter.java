@@ -35,6 +35,7 @@ public class Voter implements Runnable {
 
 	public void queueVote(Vote v) {
 		app.votes.add(v);
+		notifyVoteQueueChanged();
 	}
 
 	public void stop(){
