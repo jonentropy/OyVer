@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.canthack.tris.android.media.SoundEffects;
+
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -15,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -36,6 +39,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	private View mainLayout;
 	private Spinner talkSpinner;
 	private Button goButton;
+	private Vibrator vibrator;
 
 	//views that are only to be displayed in fullscreen mode
 	private final ArrayList<View> fsViews = new ArrayList<View>();
@@ -50,7 +54,6 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	}
 
 	private NonConfigurationObject nco;
-
 	private int selectedTalkId = -1;
 	private String selectedTalkTitle = "";
 
@@ -63,6 +66,8 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		mainLayout = this.findViewById(android.R.id.content).getRootView();
 		talkSpinner = (Spinner) this.findViewById(R.id.spinner1);
 		goButton = (Button) this.findViewById(R.id.go_button);
+		
+		vibrator = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 
 		fsViews.add(this.findViewById(R.id.yay_button));
 		fsViews.add(this.findViewById(R.id.meh_button));
@@ -229,6 +234,16 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		Log.v(TAG, "voting on " + selectedTalkId);
 		if(selectedTalkId < 0)
 			return;
+		
+		//Play sound
+		if(Settings.getSoundsEnabled(getBaseContext())){
+			SoundEffects.playEffect(this, R.raw.click);	
+		}
+		
+		//Vibrate
+		if(Settings.getVibrationEnabled(getBaseContext())){
+			vibrator.vibrate(100);	
+		}
 
 		ObjectAnimator animator = ObjectAnimator.ofFloat(v, "alpha", 0.2f, 1f);
 

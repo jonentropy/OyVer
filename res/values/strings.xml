@@ -13,6 +13,8 @@
     <string name="settings_title">Settings</string>
     <string name="default_hostname">http://</string>
     <string name="server_string">Sessions location</string>
+    <string name="sounds_string">Enable sounds</string>
+    <string name="vibration_string">Enable vibration</string>
     <string name="vote_server_string">Voting location</string>
     <string name="error_downloading_talks">Could not load sessions. Check settings.</string>
     <string name="title_activity_vote_list">Pending Votes</string>

@@ -11,6 +11,8 @@ import android.preference.PreferenceManager;
 public class Settings extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	public static final String OYVER_SETTING_SERVER = "server";
 	public static final String OYVER_SETTING_VOTING = "voting";
+	public static final String OYVER_SETTING_SOUNDS = "sounds";
+	public static final String OYVER_SETTING_VIBRATION = "vibration";
 	
 	private EditTextPreference mServerPref;
 	private EditTextPreference mVotingPref;
@@ -24,6 +26,16 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 	public static String getVotingServerAddress(Context context) {
 		return PreferenceManager.getDefaultSharedPreferences(context)
 				.getString(OYVER_SETTING_VOTING, context.getResources().getString(R.string.default_hostname));
+	}
+	
+	public static boolean getSoundsEnabled(Context context) {
+		return PreferenceManager.getDefaultSharedPreferences(context)
+				.getBoolean(OYVER_SETTING_SOUNDS, true);
+	}
+	
+	public static boolean getVibrationEnabled(Context context) {
+		return PreferenceManager.getDefaultSharedPreferences(context)
+				.getBoolean(OYVER_SETTING_VIBRATION, true);
 	}
 
 	@Override
