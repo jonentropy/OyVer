@@ -241,7 +241,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		}
 		
 		//Vibrate
-		if(Settings.getVibrationEnabled(getBaseContext())){
+		if(Settings.getVibrationEnabled(getBaseContext()) && vibrator != null){
 			vibrator.vibrate(100);	
 		}
 
