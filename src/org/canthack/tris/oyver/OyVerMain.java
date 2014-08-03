@@ -328,15 +328,24 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		}
 		else{
 			Log.v(TAG, "Back pressed");
-			if(nco != null && nco.voter != null && nco.voterThread != null){
-				Log.v(TAG, "Stopping threads");
-				nco.voter.stop();
-				try {
-					nco.voterThread.join();
-				} catch (InterruptedException e) {}
-			}
-
+			stopVoter();
 			super.onBackPressed();
+		}
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		stopVoter();
+	}
+
+	private void stopVoter() {
+		if(nco != null && nco.voter != null && nco.voterThread != null){
+			Log.v(TAG, "Stopping threads");
+			nco.voter.stop();
+			try {
+				nco.voterThread.join();
+			} catch (InterruptedException e) {}
 		}
 	}
 }
