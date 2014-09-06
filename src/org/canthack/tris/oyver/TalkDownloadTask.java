@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import org.canthack.tris.oyver.model.json.ListTalksResponse;
 import org.canthack.tris.oyver.model.json.Talk;
+import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.Context;
@@ -88,7 +89,7 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 	}
 	
 	public void populateTalks(Spinner s){
-		if(downloadedTalks == null)
+		if(downloadedTalks == null || downloadedTalks.talks == null)
 			return;
 
 		Log.d(TAG, "Populating");
@@ -141,10 +142,12 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 			final Gson gson = new Gson();
 			try {
 				response = gson.fromJson(new BufferedReader(new InputStreamReader(mContext.openFileInput(SESSIONS_FILENAME))), ListTalksResponse.class);
+				if(response.talks == null) throw new JSONException("No talks available.");
 				lastError = null;
 			} catch (Exception e){
 				setProgress(-1);
 				lastError = e.getMessage() + ".";
+				return null;
 			}
 		}
 
