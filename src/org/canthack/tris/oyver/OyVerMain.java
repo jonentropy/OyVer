@@ -49,8 +49,6 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 	static class NonConfigurationObject{
 		TalkDownloadTask talkDLTask;
-		Voter voter;
-		Thread voterThread;
 	}
 
 	private NonConfigurationObject nco;
@@ -77,7 +75,6 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		normalViews.add(goButton);
 
 		if( (nco = (NonConfigurationObject)getLastNonConfigurationInstance()) != null) {
-
 			if( nco.talkDLTask != null) {
 				nco.talkDLTask.setContext(this); 
 				if(nco.talkDLTask.getStatus() == AsyncTask.Status.FINISHED)
@@ -86,19 +83,10 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			else{
 				downloadTalks();
 			}
-
-			if(nco.voter != null){
-				nco.voter.setContext(this);
-			}
 		}
 		else{
 			Log.v(TAG, "Making new NCO");
 			nco = new NonConfigurationObject();
-
-			nco.voter = new Voter(this, (OyVerApp)getApplication());
-			nco.voterThread = new Thread(null, nco.voter, "Voter");
-			nco.voterThread.start();
-
 			downloadTalks();
 		}
 
@@ -242,7 +230,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		
 		//Vibrate
 		if(Settings.getVibrationEnabled(getBaseContext()) && vibrator != null){
-			vibrator.vibrate(100);	
+			vibrator.vibrate(50);	
 		}
 
 		ObjectAnimator animator = ObjectAnimator.ofFloat(v, "alpha", 0.2f, 1f);
@@ -270,7 +258,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 				}
 
 				if(vote != null){
-					nco.voter.queueVote(vote);
+					OyVerApp.voter.queueVote(vote);
 				}
 			}	
 		};
@@ -307,7 +295,7 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	}
 
 	// This gets called before onDestroy(). We want to pass forward a reference
-	// to our AsyncTask.
+	// to our NCO.
 	@Override
 	public Object onRetainNonConfigurationInstance() {
 		return nco;
@@ -328,24 +316,8 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		}
 		else{
 			Log.v(TAG, "Back pressed");
-			stopVoter();
+			OyVerApp.voter.serialiseNow();
 			super.onBackPressed();
-		}
-	}
-	
-	@Override
-	public void onDestroy(){
-		super.onDestroy();
-		stopVoter();
-	}
-
-	private void stopVoter() {
-		if(nco != null && nco.voter != null && nco.voterThread != null){
-			Log.v(TAG, "Stopping threads");
-			nco.voter.stop();
-			try {
-				nco.voterThread.join();
-			} catch (InterruptedException e) {}
 		}
 	}
 }

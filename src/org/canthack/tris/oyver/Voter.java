@@ -1,34 +1,35 @@
 package org.canthack.tris.oyver;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Queue;
+import java.lang.reflect.Type;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 public class Voter implements Runnable {
 	private static final String TAG = "OyVer Voter";
-	private static final String SERIAL_FILENAME = "votes";
-	public static final int MAX_ATTEMPTS = 10;
+	private static final String SERIAL_PREF = "votes";
+	private static final String EMPTY_JSON_ARRAY = "[]";
 
-	private Context ctx = null;
+	Gson gson = new Gson();
+	private Context appCtx;
 	private boolean running = true;
 	private OyVerApp app;
-	private long lastSerialisedTime;
+	private volatile long lastSerialisedTime;
 	private static final long SERIALISE_PERIOD = 10l * 1000l * 1000l * 1000l; //10 seconds.
 
 	public Voter(Context c, OyVerApp app){
-		this.ctx = c;		
+		this.appCtx = c.getApplicationContext();		
 		this.app = app;
 		deserialiseVotes();
 	}
@@ -43,47 +44,13 @@ public class Voter implements Runnable {
 		running = false;
 	}
 
-	public void setContext(Context c){
-		this.ctx = c;
-	}
-
 	private void deserialiseVotes(){
 		synchronized(Voter.class){
-			boolean found = false;
-			for(String s: ctx.fileList()){
-				if(s.equals(SERIAL_FILENAME)){
-					found = true;
-					break;
-				}
-			}
-			if(found){
-				Log.v(TAG, "DeSerialising votes");
-
-				FileInputStream fis;
-				try {
-					fis = ctx.openFileInput(SERIAL_FILENAME);
-				} catch (FileNotFoundException e1) {
-					Log.v(TAG, "Couldnt find deserialise file.");
-					return;
-				}
-
-				try {
-					ObjectInputStream os = new ObjectInputStream(fis);
-					try {
-						app.votes = (Queue<Vote>) os.readObject();
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
-						Log.v(TAG, "Couldnt deserialise file.");
-					}
-
-					os.close();
-					ctx.deleteFile(SERIAL_FILENAME);
-
-				} catch (IOException e) {
-					e.printStackTrace();
-					Log.v(TAG, "Couldnt deserialise file.");
-				}
-			}
+			Log.v(TAG, "DeSerialising votes");
+			
+			String votes = PreferenceManager.getDefaultSharedPreferences(appCtx).getString(SERIAL_PREF, EMPTY_JSON_ARRAY);	
+			Type voteQueueType = new TypeToken<LinkedBlockingQueue<Vote>>(){}.getType();
+			app.votes = gson.fromJson(votes, voteQueueType);
 		}
 	}
 
@@ -99,7 +66,7 @@ public class Voter implements Runnable {
 			}
 
 			if(!app.votes.isEmpty()){
-				ConnectivityManager cm = (ConnectivityManager)ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+				ConnectivityManager cm = (ConnectivityManager)appCtx.getSystemService(Context.CONNECTIVITY_SERVICE);
 				NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
 				boolean isConnected = !(activeNetwork == null) && activeNetwork.isConnectedOrConnecting();
@@ -112,13 +79,12 @@ public class Voter implements Runnable {
 						notifyVoteQueueChanged();
 					}		
 				}
-				else{
-					//periodically serialise votes just in case...
-					if(System.nanoTime() > lastSerialisedTime + SERIALISE_PERIOD){
-						serialiseVotes();
-						lastSerialisedTime = System.nanoTime();
-					}
-				}
+			}
+			
+			//periodically serialise votes just in case, even if online...
+			if(System.nanoTime() > lastSerialisedTime + SERIALISE_PERIOD){
+				serialiseVotes();
+				lastSerialisedTime = System.nanoTime();
 			}
 		}
 		//stopped, serialise what we haven't sent yet
@@ -128,37 +94,15 @@ public class Voter implements Runnable {
 	private void notifyVoteQueueChanged() {
 		Log.d("Voter", "Broadcasting changed message");
 		Intent intent = new Intent("voteQueueUpdated");
-		LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
+		LocalBroadcastManager.getInstance(appCtx).sendBroadcast(intent);
 	}
 
 	private void serialiseVotes(){
 		synchronized(Voter.class){
-			if(!app.votes.isEmpty()){
-				Log.v(TAG, "Serialising votes");
-
-				FileOutputStream fos = null;
-				try { 
-					ctx.deleteFile(SERIAL_FILENAME);
-					fos = ctx.openFileOutput(SERIAL_FILENAME, Context.MODE_PRIVATE);
-				} catch (FileNotFoundException e) {
-					Log.v(TAG, "Could not serialise votes");
-					e.printStackTrace();
-					return;
-				}
-
-				try {
-					ObjectOutputStream os = new ObjectOutputStream(fos);
-					os.writeObject(app.votes);
-					os.flush();
-					os.close();
-
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			else{
-				ctx.deleteFile(SERIAL_FILENAME);
-			}
+			Log.v(TAG, "Serialising votes");
+		
+			String votes = gson.toJson(app.votes);
+			PreferenceManager.getDefaultSharedPreferences(appCtx).edit().putString(SERIAL_PREF, votes).apply();			
 		}
 	}
 
@@ -175,4 +119,9 @@ public class Voter implements Runnable {
 		}
 		return true;	
 	}
+	
+	public void serialiseNow() {
+		lastSerialisedTime = System.nanoTime() - SERIALISE_PERIOD - 1;
+	}
+	
 }
