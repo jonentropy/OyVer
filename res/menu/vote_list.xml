@@ -4,7 +4,7 @@
         android:id="@+id/action_clear_all"
         android:orderInCategory="100"
         android:showAsAction="always"
-        android:icon="@android:drawable/ic_menu_delete"
+        android:icon="@drawable/ic_delete"
         android:title="@string/action_clear_all"/>
 
 </menu>
