@@ -1,10 +1,5 @@
 package org.canthack.tris.oyver;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -16,30 +11,35 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class Voter implements Runnable {
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.util.concurrent.LinkedBlockingQueue;
+
+class Voter implements Runnable {
 	private static final String TAG = "OyVer Voter";
 	private static final String SERIAL_PREF = "votes";
 	private static final String EMPTY_JSON_ARRAY = "[]";
 
-	Gson gson = new Gson();
+	private Gson gson = new Gson();
 	private Context appCtx;
 	private boolean running = true;
 	private OyVerApp app;
 	private volatile long lastSerialisedTime;
-	private static final long SERIALISE_PERIOD = 10l * 1000l * 1000l * 1000l; //10 seconds.
+	private static final long SERIALISE_PERIOD = 10L * 1000L * 1000L * 1000L; //10 seconds.
 
-	public Voter(Context c, OyVerApp app){
+	Voter(Context c, OyVerApp app){
 		this.appCtx = c.getApplicationContext();		
 		this.app = app;
 		deserialiseVotes();
 	}
 
-	public void queueVote(Vote v) {
+	void queueVote(Vote v) {
 		app.votes.add(v);
 		notifyVoteQueueChanged();
 	}
 
-	public void stop(){
+	void stop(){
 		Log.v(TAG, "Voter Stopping");
 		running = false;
 	}
@@ -120,7 +120,7 @@ public class Voter implements Runnable {
 		return true;	
 	}
 	
-	public void serialiseNow() {
+	void serialiseNow() {
 		lastSerialisedTime = System.nanoTime() - SERIALISE_PERIOD - 1;
 	}
 	

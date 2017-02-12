@@ -1,13 +1,8 @@
 package org.canthack.tris.oyver;
 
-import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.canthack.tris.android.media.SoundEffects;
-
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +24,12 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.canthack.tris.android.media.SoundEffects;
+
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class OyVerMain extends Activity implements OnSharedPreferenceChangeListener {
 	private static final String TAG = "OyVer Main";
 
@@ -42,10 +43,10 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 	private Vibrator vibrator;
 
 	//views that are only to be displayed in fullscreen mode
-	private final ArrayList<View> fsViews = new ArrayList<View>();
+	private final ArrayList<View> fsViews = new ArrayList<>();
 
 	//views that are only to be displayed in non fullscreen mode
-	private final ArrayList<View> normalViews = new ArrayList<View>();
+	private final ArrayList<View> normalViews = new ArrayList<>();
 
 	static class NonConfigurationObject{
 		TalkDownloadTask talkDLTask;
@@ -187,7 +188,8 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 
 			getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			mainLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
-			getActionBar().hide();
+			final ActionBar aBar = getActionBar();
+            if (aBar != null) aBar.hide();
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);	
 
 			for(View v: fsViews) v.setVisibility(View.VISIBLE);
@@ -196,7 +198,8 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			for(View v: fsViews) v.setVisibility(View.GONE);
 
 			getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-			getActionBar().show();
+            final ActionBar aBar = getActionBar();
+            if (aBar != null) aBar.show();
 			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			mainLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
 

@@ -2,12 +2,12 @@ package org.canthack.tris.oyver;
 
 import java.io.Serializable;
 
-public class Vote implements Serializable{
+class Vote implements Serializable{
 	private static final long serialVersionUID = -5022092856758509133L;
 
-	public static final int YAY = 0;
-	public static final int MEH = 1;
-	public static final int NAY = 2;
+	static final int YAY = 0;
+	static final int MEH = 1;
+	static final int NAY = 2;
 
 	private String url = "";
 
@@ -15,7 +15,7 @@ public class Vote implements Serializable{
 
 	private int voteType;
 
-	public Vote(String endpoint, int id, String name, int vt){
+	Vote(String endpoint, int id, String name, int vt){
 		this.talkName = name;
 		this.voteType = vt;
 		
@@ -39,7 +39,7 @@ public class Vote implements Serializable{
 		url = urlBuilder.toString();
 	}
 
-	public String getUrl(){
+	String getUrl(){
 		return url;
 	}
 	

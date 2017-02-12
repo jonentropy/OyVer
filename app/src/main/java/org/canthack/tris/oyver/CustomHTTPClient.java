@@ -1,7 +1,6 @@
 package org.canthack.tris.oyver;
 
-import java.io.IOException;
-import java.io.InputStream;
+import android.util.Log;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -29,7 +28,8 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 
-import android.util.Log;
+import java.io.IOException;
+import java.io.InputStream;
 /**
  * Provides a single, shared, thread-safe HTTPClient.
  */
@@ -129,10 +129,7 @@ public final class CustomHTTPClient {
 
 				return s;
 			} 
-			catch (IOException e) {
-				getRequest.abort();
-			}
-			catch(IllegalStateException e){
+			catch (IOException | IllegalStateException e) {
 				getRequest.abort();
 			}
 

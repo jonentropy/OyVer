@@ -1,16 +1,5 @@
 package org.canthack.tris.oyver;
 
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-
-import org.canthack.tris.oyver.model.json.ListTalksResponse;
-import org.canthack.tris.oyver.model.json.Talk;
-import org.json.JSONException;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -23,26 +12,36 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksResponse>{
+import org.canthack.tris.oyver.model.json.ListTalksResponse;
+import org.canthack.tris.oyver.model.json.Talk;
+import org.json.JSONException;
+
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+
+class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksResponse>{
 
 	private Context mContext; // reference to the calling Activity
-	int progress = -1;
+	private int progress = -1;
 	private ListTalksResponse downloadedTalks = null;
-	private ArrayList<Integer> talkIds = new ArrayList<Integer>();
+	private ArrayList<Integer> talkIds = new ArrayList<>();
 	
-	String lastError;
-	private String SESSIONS_FILENAME = "sessions.json";
+	private String lastError;
 	private static final String TAG = "OyVer DownloadTask";
 
 	TalkDownloadTask(Context context) {
 		mContext = context;
 	}
 
-	public boolean downloadedOk(){
+	boolean downloadedOk(){
 		return downloadedTalks != null;
 	}
 	// Called from main thread to re-attach
-	protected void setContext(Context context) {
+    void setContext(Context context) {
 		mContext = context;
 		if(progress >= 0) {
 			publishProgress(this.progress);
@@ -88,7 +87,7 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 		}
 	}
 	
-	public void populateTalks(Spinner s){
+	void populateTalks(Spinner s){
 		if(downloadedTalks == null || downloadedTalks.talks == null)
 			return;
 
@@ -96,24 +95,25 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 		
 		talkIds.clear();
 
-		ArrayList<String> talkNames = new ArrayList<String>();
+		ArrayList<String> talkNames = new ArrayList<>();
 
 		for(Talk t : downloadedTalks.talks){
 			talkNames.add(t.title);
 			talkIds.add(t.id);
 		}
 
-		ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_dropdown_item, talkNames);	
+		ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(mContext, android.R.layout.simple_spinner_dropdown_item, talkNames);
 		spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); 
 		spinnerArrayAdapter.insert(mContext.getString(R.string.select_session), 0);
 		s.setAdapter(spinnerArrayAdapter);
 	}
 
-	public ListTalksResponse downloadTalks(String location)
-	{
+	private ListTalksResponse downloadTalks(String location) {
 		setProgress(1);
 		ListTalksResponse response = null;
-		
+
+		final String SESSIONS_FILENAME = "sessions.json";
+
 		try{
 			final InputStream source = CustomHTTPClient.retrieveStream(location);
 			final Reader reader = new InputStreamReader(source);
@@ -123,9 +123,9 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 			response = gson.fromJson(bir, ListTalksResponse.class);
 
 			//Save sessions ready for offline use
-			String jsonRepresentation = gson.toJson(response);
+			final String jsonRepresentation = gson.toJson(response);
 					 
-			FileOutputStream fos = mContext.openFileOutput(SESSIONS_FILENAME, Context.MODE_PRIVATE);
+			final FileOutputStream fos = mContext.openFileOutput(SESSIONS_FILENAME, Context.MODE_PRIVATE);
 			fos.write(jsonRepresentation.getBytes());
 			fos.flush();
 			fos.close();
@@ -155,7 +155,7 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 		return response;
 	}
 	
-	public ArrayList<Integer> getTalkIds(){
+	ArrayList<Integer> getTalkIds(){
 		return talkIds;
 	}
 
@@ -164,7 +164,7 @@ public class TalkDownloadTask extends AsyncTask<String, Integer, ListTalksRespon
 		publishProgress(this.progress);
 	}
 	
-	public ListTalksResponse getTalks(){
+	ListTalksResponse getTalks(){
 		return downloadedTalks;
 	}
 }

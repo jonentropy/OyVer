@@ -1,24 +1,33 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 25
     buildToolsVersion "25.0.2"
+
+    useLibrary 'org.apache.http.legacy'
+
+    signingConfigs {
+        release {
+            storeFile file("/Users/tristan/Development/androidkeystore")
+        }
+    }
 
     defaultConfig {
         applicationId "org.canthack.tris.oyver"
         minSdkVersion 11
-        targetSdkVersion 22
+        targetSdkVersion 25
     }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.release
         }
     }
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.google.code.gson:gson:2.2.2'
+    compile "com.android.support:support-core-utils:25.1.1"
+    compile 'com.google.code.gson:gson:2.4'
 }

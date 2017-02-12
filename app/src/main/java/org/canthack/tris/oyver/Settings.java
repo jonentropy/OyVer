@@ -54,7 +54,7 @@ public class Settings extends PreferenceActivity implements OnSharedPreferenceCh
 			mServerPref.setSummary(prefs.getString(key, "")); 
 		}
 		else if (key.equals(OYVER_SETTING_VOTING)) {
-			mVotingPref.setSummary(prefs.getString(key, "")); 
+			mVotingPref.setSummary(prefs.getString(key, ""));
 		}
 	}
 

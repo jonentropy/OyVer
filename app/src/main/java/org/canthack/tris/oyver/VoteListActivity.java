@@ -1,7 +1,5 @@
 package org.canthack.tris.oyver;
 
-import java.util.Queue;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -20,17 +18,18 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.Queue;
+
 public class VoteListActivity extends Activity {
 	private DialogInterface.OnClickListener clearAllClickListener;
 	private ListView lv;
 	private Queue<Vote> votes;
-	private ArrayAdapter<Vote> arrayAdapter;
-	private MenuItem clearAllItem;
+    private MenuItem clearAllItem;
 	
 	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d("Votes queue changed listener", "Received event");
+			Log.d("Votes queue changed", "Received event");
 			runOnUiThread(new Runnable(){
 				@Override
 				public void run() {
@@ -78,7 +77,7 @@ public class VoteListActivity extends Activity {
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 				case DialogInterface.BUTTON_POSITIVE:
-					try{votes.remove(item);}catch(Exception e){}
+					try{votes.remove(item);}catch(Exception e){Log.e("Vote List", "Could not remove");}
 					setAdapter();
 					break;
 				}
@@ -89,17 +88,17 @@ public class VoteListActivity extends Activity {
 	}
 
 	private void setAdapter() {
-		Vote[] voteArray = ((OyVerApp)getApplication()).votes.toArray(new Vote[0]);
-		arrayAdapter = new ArrayAdapter<Vote>(this, android.R.layout.simple_list_item_1, voteArray);
+		final Vote[] voteArray = ((OyVerApp)getApplication()).votes.toArray(new Vote[0]);
+        final ArrayAdapter<Vote> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, voteArray);
 		lv.setAdapter(arrayAdapter);
-		if(clearAllItem != null) clearAllItem.setVisible(voteArray != null && voteArray.length > 0);
+		if(clearAllItem != null) clearAllItem.setVisible(voteArray.length > 0);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.vote_list, menu);
-		this.clearAllItem = (MenuItem) menu.findItem(R.id.action_clear_all);
+		this.clearAllItem = menu.findItem(R.id.action_clear_all);
 		setAdapter(); //Do this now so that the menu item already exists.
 		return true;
 	}
