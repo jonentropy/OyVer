@@ -21,9 +21,11 @@
     <string name="title_activity_vote_summary">Pending Vote Summary</string>
     <string name="action_clear_all">Clear all pending votes</string>
     <string name="edit_votes_title">Edit pending votes</string>
+    <string name="pending_votes_title">View vote summary</string>
     <string name="are_you_sure_clear">Delete pending vote?</string>
     <string name="are_you_sure_clear_all">Are you sure you want to delete all pending votes?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="no_votes">There are no votes waiting to be sent</string>
 
 </resources>

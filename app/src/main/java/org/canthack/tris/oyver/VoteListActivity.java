@@ -1,7 +1,7 @@
 package org.canthack.tris.oyver;
 
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,7 +20,7 @@ import android.widget.ListView;
 
 import java.util.Queue;
 
-public class VoteListActivity extends Activity {
+public class VoteListActivity extends ListActivity {
 	private DialogInterface.OnClickListener clearAllClickListener;
 	private ListView lv;
 	private Queue<Vote> votes;
@@ -45,7 +45,7 @@ public class VoteListActivity extends Activity {
 		setContentView(R.layout.activity_vote_list);
 
 		votes = ((OyVerApp)getApplication()).votes;
-		lv = (ListView) findViewById(R.id.list);
+		lv = getListView();
 
 		//for when the queue changes..
 		LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,

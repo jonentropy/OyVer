@@ -156,6 +156,9 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 		case R.id.action_list_votes:
 			startActivity(new Intent(this, VoteListActivity.class));
 			return true;
+		case R.id.action_view_vote_summary:
+				startActivity(new Intent(this, VoteSummaryActivity.class));
+				return true;
 		default:
 			break;
 
