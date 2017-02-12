@@ -18,6 +18,7 @@
     <string name="vote_server_string">Voting location</string>
     <string name="error_downloading_talks">Could not load sessions. Check settings.</string>
     <string name="title_activity_vote_list">Pending Votes</string>
+    <string name="title_activity_vote_summary">Pending Vote Summary</string>
     <string name="action_clear_all">Clear all pending votes</string>
     <string name="edit_votes_title">Edit pending votes</string>
     <string name="are_you_sure_clear">Delete pending vote?</string>
