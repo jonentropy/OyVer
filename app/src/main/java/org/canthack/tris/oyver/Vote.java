@@ -42,6 +42,14 @@ class Vote implements Serializable{
 	String getUrl(){
 		return url;
 	}
+
+    String getTalkName() {
+        return talkName;
+    }
+
+	int getVoteType() {
+		return voteType;
+	}
 	
 	public String toString(){
 		StringBuilder builder = new StringBuilder().append(talkName).append(" ");
