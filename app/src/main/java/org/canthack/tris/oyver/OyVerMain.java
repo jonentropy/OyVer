@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -190,21 +189,27 @@ public class OyVerMain extends Activity implements OnSharedPreferenceChangeListe
 			talkSpinner.setVisibility(View.INVISIBLE);
 
 			getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-			mainLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+
+
 			final ActionBar aBar = getActionBar();
             if (aBar != null) aBar.hide();
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);	
 
 			for(View v: fsViews) v.setVisibility(View.VISIBLE);
-		}
+
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
 		else{
 			for(View v: fsViews) v.setVisibility(View.GONE);
 
 			getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             final ActionBar aBar = getActionBar();
             if (aBar != null) aBar.show();
-			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			mainLayout.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);	
 
 			for(View v: normalViews) v.setVisibility(View.VISIBLE);
 			if(nco != null && nco.talkDLTask != null && nco.talkDLTask.downloadedOk()){
