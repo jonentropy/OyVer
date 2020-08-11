@@ -1,21 +1,21 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 30
+    buildToolsVersion "29.0.2"
 
     useLibrary 'org.apache.http.legacy'
 
     signingConfigs {
         release {
-            storeFile file("/Users/tristan/Development/androidkeystore")
+            storeFile file('/Users/tristan/Documents/androidkeystore')
         }
     }
 
     defaultConfig {
         applicationId "org.canthack.tris.oyver"
-        minSdkVersion 11
-        targetSdkVersion 25
+        minSdkVersion 14
+        targetSdkVersion 30
     }
 
     buildTypes {
@@ -28,6 +28,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-core-utils:25.1.1'
-    compile 'com.google.code.gson:gson:2.4'
+    implementation 'androidx.legacy:legacy-support-core-utils:1.0.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
